@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "pretest": "eslint index.js test/",
-    "test": "echo \"coming soon\""
+    "test": "echo \"coming soon\"",
+    "ci": "npm test"
   },
   "repository": {
     "type": "git",
