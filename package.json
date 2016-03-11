@@ -23,6 +23,7 @@
   "homepage": "https://github.com/colestrode/skellington#readme",
   "dependencies": {
     "botkit": "0.0.8",
+    "express": "^4.13.4",
     "lodash": "^4.6.1"
   },
   "devDependencies": {

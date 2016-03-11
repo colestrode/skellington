@@ -1,10 +1,11 @@
 'use strict';
 
 let Botkit = require('botkit');
+let express = require('express');
 let _ = require('lodash');
 
 module.exports = function(config) {
-  _.defaults(config, {debug: false, bots: [], slackToken: process.env.SLACK_API_TOKEN});
+  _.defaults(config, {debug: false, bots: [], slackToken: process.env.SLACK_API_TOKEN, port: 8080});
 
   if(typeof config.bots === 'function') {
     config.bots = [config.bots];
@@ -19,6 +20,7 @@ module.exports = function(config) {
   }
 
   let controller = Botkit.slackbot(slackbotConfig);
+  let server = startServer(config, controller);
 
   // connect the bot to a stream of messages
   let bot = controller.spawn({
@@ -32,13 +34,13 @@ module.exports = function(config) {
     }
 
     _.forEach(config.bots, function(bot) {
-      bot(controller, connectedBot);
+      bot(controller, connectedBot, server);
     });
   });
 
   // restart if disconnected
   controller.on('rtm_close', function() {
-    controller.log('attempting to reconnect');
+    controller.log('rtm closed, attempting to reconnect', 'warning');
     bot.startRTM(function(err) {
       if (err) {
         logError(controller, err, 'could not reconnect to the rtm, shutting down');
@@ -48,6 +50,20 @@ module.exports = function(config) {
   });
 
   /**
+   * Starts an express server for slash commands
+   *
+   * @param config
+   * @param contoller
+   * @returns {*}
+   */
+  function startServer(config, contoller) {
+    let expressApp = express();
+    expressApp.listen(config.port);
+    contoller.log('listening on port ' + config.port, 'notice');
+    return expressApp;
+  }
+
+  /**
    * Convenience method to log errors
    *
    * @param controller
@@ -55,7 +71,7 @@ module.exports = function(config) {
    * @param message
    */
   function logError(controller, err, message) {
-    controller.log(message);
-    controller.log(err);
+    controller.log(message, 'error');
+    controller.log(err, 'error');
   }
 };
