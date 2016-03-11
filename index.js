@@ -14,10 +14,10 @@ module.exports = function(config) {
     slackbotConfig.storage = config.storage;
   }
 
-  var controller = Botkit.slackbot(slackbotConfig);
+  let controller = Botkit.slackbot(slackbotConfig);
 
   // connect the bot to a stream of messages
-  var bot = controller.spawn({
+  let bot = controller.spawn({
     token: config.slackToken
   });
 
