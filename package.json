@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "pretest": "eslint index.js test/",
-    "test": "echo \"coming soon\"",
-    "ci": "npm test"
+    "test": "istanbul cover --report lcov --dir ./coverage/ _mocha --recursive ./test --grep ./test/**/*.spec.js -- --colors --reporter spec",
+    "ci": "npm test && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,13 @@
     "lodash": "^4.6.1"
   },
   "devDependencies": {
-    "eslint": "^2.3.0"
+    "chai": "^3.5.0",
+    "coveralls": "^2.11.8",
+    "eslint": "^2.3.0",
+    "istanbul": "^0.4.2",
+    "mocha": "^2.4.5",
+    "proxyquire": "^1.7.4",
+    "sinon": "^1.17.3",
+    "sinon-chai": "^2.8.0"
   }
 }
