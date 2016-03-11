@@ -4,7 +4,8 @@
   "description": "A plugable bot system for botkit",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "eslint index.js test/",
+    "test": "echo \"coming soon\""
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,8 @@
   "dependencies": {
     "botkit": "0.0.8",
     "lodash": "^4.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^2.3.0"
   }
 }
