@@ -3,9 +3,13 @@
 let Botkit = require('botkit');
 let _ = require('lodash');
 
-
 module.exports = function(config) {
-  _.defaults(config, {debug: false, bots: []});
+  _.defaults(config, {debug: false, bots: [], slackToken: process.env.SLACK_API_TOKEN});
+
+  if(typeof config.bots === 'function') {
+    config.bots = [config.bots];
+  }
+
   let slackbotConfig = {
     debug: config.debug
   };
@@ -27,7 +31,7 @@ module.exports = function(config) {
       process.exit(1);
     }
 
-    _.forEach(bots(config), function(bot) {
+    _.forEach(config.bots, function(bot) {
       bot(controller, connectedBot);
     });
   });
@@ -42,19 +46,6 @@ module.exports = function(config) {
       }
     });
   });
-
-  /**
-   * Pulls bots from config and from package.json
-   * @param config
-   * @returns {Array.<T>}
-   */
-  function bots(config) {
-    let packageBots = _.map(require('package.json').skellington, function(module) {
-      return require(module);
-    });
-
-    return config.bots.concat(packageBots);
-  }
 
   /**
    * Convenience method to log errors
