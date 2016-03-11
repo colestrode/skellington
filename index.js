@@ -7,7 +7,7 @@ let _ = require('lodash');
 module.exports = function(config) {
   _.defaults(config, {debug: false, bots: [], slackToken: process.env.SLACK_API_TOKEN, port: 8080});
 
-  if(typeof config.bots === 'function') {
+  if (typeof config.bots === 'function') {
     config.bots = [config.bots];
   }
 
@@ -21,8 +21,6 @@ module.exports = function(config) {
 
   let controller = Botkit.slackbot(slackbotConfig);
   let server = startServer(config, controller);
-
-  // connect the bot to a stream of messages
   let bot = controller.spawn({
     token: config.slackToken
   });
@@ -58,6 +56,7 @@ module.exports = function(config) {
    */
   function startServer(config, contoller) {
     let expressApp = express();
+
     expressApp.listen(config.port);
     contoller.log('listening on port ' + config.port, 'notice');
     return expressApp;
