@@ -31,8 +31,8 @@ module.exports = function(config) {
       process.exit(1);
     }
 
-    _.forEach(config.bots, function(bot) {
-      bot(controller, connectedBot, server);
+    _.forEach(config.bots, function(externalBot) {
+      externalBot(controller, connectedBot, server);
     });
   });
 
