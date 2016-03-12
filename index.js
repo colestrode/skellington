@@ -4,11 +4,11 @@ let Botkit = require('botkit');
 let express = require('express');
 let _ = require('lodash');
 
-module.exports = function(config) {
-  _.defaults(config, {debug: false, bots: [], slackToken: process.env.SLACK_API_TOKEN});
+module.exports = (config) => {
+  _.defaults(config, {debug: false, plugins: [], slackToken: process.env.SLACK_API_TOKEN});
 
-  if (typeof config.bots === 'function') {
-    config.bots = [config.bots];
+  if (typeof config.plugins === 'function') {
+    config.plugins = [config.plugins];
   }
 
   let slackbotConfig = {
@@ -29,21 +29,21 @@ module.exports = function(config) {
     server = startServer(config, controller);
   }
 
-  bot.startRTM(function(err, connectedBot) {
+  bot.startRTM((err, connectedBot) => {
     if (err) {
       logError(controller, err, 'Error connecting to RTM');
       process.exit(1);
     }
 
-    _.forEach(config.bots, function(externalBot) {
-      externalBot(controller, connectedBot, server);
+    _.forEach(config.plugins, (plugin) => {
+      plugin(controller, connectedBot, server);
     });
   });
 
   // restart if disconnected
-  controller.on('rtm_close', function() {
+  controller.on('rtm_close', () => {
     controller.log('rtm closed, attempting to reconnect');
-    bot.startRTM(function(err) {
+    bot.startRTM((err) =>{
       if (err) {
         logError(controller, err, 'could not reconnect to the rtm, shutting down');
         process.exit(1);
