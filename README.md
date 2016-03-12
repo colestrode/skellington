@@ -33,7 +33,7 @@ An array of bots to plug in. See [below](#bot-interface) for details.
 
 ### port
 
-Sets the port for the built in express server. Defaults to `8080`.
+If passed, will create an express server listening on the port.
 
 ### debug
 
@@ -42,7 +42,8 @@ Toggles debug mode for botkit. Defaults to `false`.
 
 ## Bot Interface
 
-Each entry in the bots array should export a function that will take a botkit `controller`, `bot`, and an Express `app`:
+Each entry in the bots array should export a function that will take a botkit `controller`, `bot`, 
+and an Express `app` (if `config.port` was set):
 
 ```js
 module.exports = function(controller, bot, expressApp) {

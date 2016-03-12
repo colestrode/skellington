@@ -5,7 +5,7 @@ let express = require('express');
 let _ = require('lodash');
 
 module.exports = function(config) {
-  _.defaults(config, {debug: false, bots: [], slackToken: process.env.SLACK_API_TOKEN, port: 8080});
+  _.defaults(config, {debug: false, bots: [], slackToken: process.env.SLACK_API_TOKEN});
 
   if (typeof config.bots === 'function') {
     config.bots = [config.bots];
@@ -19,11 +19,15 @@ module.exports = function(config) {
     slackbotConfig.storage = config.storage;
   }
 
+  let server;
   let controller = Botkit.slackbot(slackbotConfig);
-  let server = startServer(config, controller);
   let bot = controller.spawn({
     token: config.slackToken
   });
+
+  if (config.port) {
+    server = startServer(config, controller);
+  }
 
   bot.startRTM(function(err, connectedBot) {
     if (err) {
@@ -38,7 +42,7 @@ module.exports = function(config) {
 
   // restart if disconnected
   controller.on('rtm_close', function() {
-    controller.log('rtm closed, attempting to reconnect', 'warning');
+    controller.log('rtm closed, attempting to reconnect');
     bot.startRTM(function(err) {
       if (err) {
         logError(controller, err, 'could not reconnect to the rtm, shutting down');
@@ -58,7 +62,7 @@ module.exports = function(config) {
     let expressApp = express();
 
     expressApp.listen(config.port);
-    contoller.log('listening on port ' + config.port, 'notice');
+    contoller.log('listening on port ' + config.port);
     return expressApp;
   }
 
@@ -70,7 +74,7 @@ module.exports = function(config) {
    * @param message
    */
   function logError(controller, err, message) {
-    controller.log(message, 'error');
-    controller.log(err, 'error');
+    controller.log(message);
+    controller.log(err);
   }
 };

@@ -62,8 +62,7 @@ describe('Skellington', function() {
 
       expect(botkitMock.slackbot).to.have.been.calledWith({debug: false});
       expect(controllerMock.spawn).to.have.been.calledWith({token: process.env.SLACK_API_TOKEN});
-      expect(expressMock).to.have.been.called;
-      expect(expressAppMock.listen).to.have.been.calledWith(8080);
+      expect(expressMock).not.to.have.been.called;
       expect(botMock.startRTM).to.be.called;
       expect(controllerMock.on).to.be.calledWithMatch('rtm_close');
     });
@@ -92,17 +91,12 @@ describe('Skellington', function() {
       callback = botMock.startRTM.args[0][0];
     });
 
-    it('should start rtm', function() {
-      callback(null, connectedBotMock);
-      expect(controllerMock.log).to.be.calledOnce;
-    });
-
     it('should exit if there is an error connecting', function() {
       var error = new Error('GAZORPAZORP');
 
       callback(error);
-      expect(controllerMock.log.callCount).to.equal(3);
-      expect(controllerMock.log.args[2][0]).to.equal(error);
+      expect(controllerMock.log.callCount).to.equal(2);
+      expect(controllerMock.log.args[1][0]).to.equal(error);
       expect(process.exit).to.be.calledWith(1);
     });
 
@@ -115,14 +109,14 @@ describe('Skellington', function() {
       });
 
       it('should initialize one bot not in an array', function() {
-        skellington({bots: externalBot});
+        skellington({bots: externalBot, port: 1234});
         botMock.startRTM.args[0][0](null, connectedBotMock);
 
         expect(externalBot).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
       });
 
       it('should initialize one bot in an array', function() {
-        skellington({bots: [externalBot]});
+        skellington({bots: [externalBot], port: 1234});
         botMock.startRTM.args[0][0](null, connectedBotMock);
 
         expect(externalBot).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
@@ -131,11 +125,18 @@ describe('Skellington', function() {
       it('should initialize multiple bots', function() {
         let anotherExternalBot = sinon.stub();
 
-        skellington({bots: [externalBot, anotherExternalBot]});
+        skellington({bots: [externalBot, anotherExternalBot], port: 1234});
         botMock.startRTM.args[0][0](null, connectedBotMock);
 
         expect(externalBot).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
         expect(anotherExternalBot).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
+      });
+
+      it('should not pass an express app if port is not set', function() {
+        skellington({bots: [externalBot]});
+        botMock.startRTM.args[0][0](null, connectedBotMock);
+
+        expect(externalBot).to.have.been.calledWith(controllerMock, connectedBotMock, undefined);
       });
     });
   });
