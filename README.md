@@ -67,7 +67,7 @@ Here's an example of how to do that using lodash's `merge` method:
 ```js
 var myTeamData = {myNamespace: 'some data'};
 controller.storage.teams.get('teamId', function(err, team) {
-  var mergedData = _.merge({}, team, myTeamData);
+  var mergedData = _.merge({id: 'teamId'}, team, myTeamData);
   controller.storage.teams.save(mergedData, function(err) {
     console.log('data updated!')
   });
