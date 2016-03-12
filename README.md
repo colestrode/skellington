@@ -31,7 +31,7 @@ Defaults to `process.env.SLACK_API_TOKEN`.
 
 ### bots
 
-An array of bots to plug in. See [below](#bot-interface) for details.
+An array of bots to plug in. See [below](#writing-bot-plugins) for details.
 
 ### port
 
