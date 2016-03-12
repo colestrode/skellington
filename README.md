@@ -17,7 +17,7 @@ match functionality. This will let you keep your code isolated while keeping you
 ```js
 require('skellington')({
   slackToken: 'xoxb-abc123-def-456',
-  bots: [require('gobot'), require('awesomo')]  
+  bots: [require('gobot'), require('awesom-o')]  
 });
 ```
 
