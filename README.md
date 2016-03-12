@@ -6,13 +6,15 @@
 
 ## Composable Botkit Bots
 
-Skellington is a skeleton for your [Botkit](https://github.com/howdyai/botkit) bots. It handles the boilerplate connection and error handling and let's you get
-down to the business of bot-making. 
+Skellington is a skeleton for your [Botkit](https://github.com/howdyai/botkit) bots. It handles the boilerplate connection 
+and error handling and let's you get down to the business of bot-making. 
 
-The real power of Skellington lies in it's composability. You can import any compatable bot into Skellington to mix and
+The real power of Skellington lies in it's composability. You can import any compatible bot into Skellington to mix and
 match functionality. This will let you keep your code isolated while keeping your deployments simple. 
 
 ## Usage
+
+This is all the code you need to write to make a Skellington bot:
 
 ```js
 require('skellington')({
@@ -33,17 +35,17 @@ An array of bots to plug in. See [below](#bot-interface) for details.
 
 ### port
 
-If passed, will create an express server listening on the port.
+If passed, will create an express server listening on the port. If not set, the express server won't be created.
 
 ### debug
 
 Toggles debug mode for botkit. Defaults to `false`.
 
 
-## Bot Interface
+## Writing Bot Plugins
 
-Each entry in the bots array should export a function that will take a botkit `controller`, `bot`, 
-and an Express `app` (if `config.port` was set):
+Each plugin bot passed to Skellington should export a function that will take a botkit `controller`, `bot`, 
+and optionally an Express `app` (this will only exist if `config.port` was set):
 
 ```js
 module.exports = function(controller, bot, expressApp) {
@@ -53,3 +55,26 @@ module.exports = function(controller, bot, expressApp) {
   });  
 };
 ```
+
+### Be Considerate: Namespace Data
+
+There will potentially be several other bots running in the same Skellington instance, so 
+be considerate when you put things into the Botkit storage. Namespace your data and don't modify things you didn't set.
+
+When you read from storage, remember to always merge your updates with what was present in storage before.
+Here's an example of how to do that using lodash's `merge` method:
+
+```js
+var myTeamData = {myNamespace: 'some data'};
+controller.storage.team.get('teamId', function(err, team) {
+  var mergedData = _.merge({}, team, myTeamData);
+  controller.storage.teams.save(mergedData, function(err) {
+    console.log('data updated!')
+  });
+})
+```
+
+### Namespace Express Paths
+
+If you are writing slash commands and need access to the express server, use a namespaced path, 
+like `/my-cool-bot/endpoint`. Don't add things to the root path, those are likely to conflict with another bot.
