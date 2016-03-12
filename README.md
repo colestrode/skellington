@@ -33,6 +33,10 @@ Defaults to `process.env.SLACK_API_TOKEN`.
 
 An array of bots to plug in. See [below](#writing-bot-plugins) for details.
 
+### storage
+
+A storage module for Botkit. Defaults to the local file store.
+
 ### port
 
 If passed, will create an express server listening on the port. If not set, the express server won't be created.
