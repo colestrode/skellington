@@ -6,11 +6,11 @@
 
 ## Composable Botkit Bots
 
-Skellington is a skeleton for your [Botkit](https://github.com/howdyai/botkit) bots. It handles the boilerplate connection 
-and error handling and let's you get down to the business of bot-making. 
+Skellington is a skeleton for your [Botkit](https://github.com/howdyai/botkit) bots. It handles the boilerplate connection
+and error handling and let's you get down to the business of bot-making.
 
 The real power of Skellington lies in it's composability. You can import plugins into Skellington to mix and
-match functionality. This will let you keep your code isolated while keeping your deployments simple. 
+match functionality. This will let you keep your code isolated while keeping your deployments simple.
 
 ## Usage
 
@@ -27,7 +27,7 @@ require('skellington')({
 
 ### slackToken
 
-Defaults to `process.env.SLACK_API_TOKEN`. 
+Defaults to `process.env.SLACK_API_TOKEN`.
 
 ### plugins
 
@@ -48,7 +48,7 @@ Toggles debug mode for botkit. Defaults to `false`.
 
 ## Writing Bot Plugins
 
-Each plugin passed to Skellington should export a function that will take a botkit `controller`, `bot`, 
+Each plugin passed to Skellington should export a function that will take a botkit `controller`, `bot`,
 and optionally an Express `app` (this will only exist if `config.port` was set):
 
 ```js
@@ -60,9 +60,11 @@ module.exports = function(controller, bot, expressApp) {
 };
 ```
 
+Learn more about the botkit API in [the howdyai/botkit docs](https://github.com/howdyai/botkit/blob/master/readme.md).
+
 ### Be Considerate: Namespace Data
 
-There will potentially be several other plugins running in the same Skellington instance, so 
+There will potentially be several other plugins running in the same Skellington instance, so
 be considerate when you put things into the Botkit storage. Namespace your data and don't modify things you didn't set.
 
 When you read from storage, remember to always merge your updates with what was present in storage before.
@@ -80,5 +82,5 @@ controller.storage.teams.get('teamId', function(err, team) {
 
 ### Namespace Express Paths
 
-If you are writing slash commands and need access to the express server, use a namespaced path, 
+If you are writing slash commands and need access to the express server, use a namespaced path,
 like `/my-cool-bot/endpoint`. Don't add things to the root path, those are likely to conflict with another bot.
