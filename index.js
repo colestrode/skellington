@@ -38,6 +38,8 @@ module.exports = (config) => {
     _.forEach(config.plugins, (plugin) => {
       plugin(controller, connectedBot, server);
     });
+
+    addHelpListeners(controller, connectedBot.identity.name, config.plugins);
   });
 
   // restart if disconnected
@@ -64,6 +66,50 @@ module.exports = (config) => {
     expressApp.listen(config.port);
     contoller.log('listening on port ' + config.port);
     return expressApp;
+  }
+
+  /**
+   * Adds all help listeners for plugins
+   *
+   * @param controller
+   * @param botName
+   * @param plugins
+   */
+  function addHelpListeners(controller, botName, plugins) {
+    let helpins = _.filter(plugins, 'help');
+    let helpCommands = [];
+
+    _.forEach(helpins, function(helpin) {
+      helpCommands.push('`@' + botName + ' help ' + helpin.help.command + '`');
+      registerHelpListener(controller, helpin.help);
+    });
+    helpCommands = helpCommands.join('\n');
+
+    controller.hears('^help$', 'direct_mention,direct_message', function(bot, message) {
+      if (!helpCommands.length) {
+        return bot.reply(message, 'I can\'t help you with anything right now. I still like you though :heart:');
+      }
+
+      return bot.reply(message, 'Here are some things I can help you with:\n' + helpCommands);
+    });
+  }
+
+  /**
+   * Adds a single help listener for a plugin
+   * @param controller
+   * @param helpInfo
+   */
+  function registerHelpListener(controller, helpInfo) {
+    controller.hears('^help ' + helpInfo.command + '$', 'direct_mention,direct_message', function(bot, message) {
+      let replyText = helpInfo.text;
+
+      if (typeof helpInfo.text === 'function') {
+        let helpOpts = _.merge({botName: bot.identity.name}, _.pick(message, ['team', 'channel', 'user']));
+        replyText = helpInfo.text(helpOpts);
+      }
+
+      bot.reply(message, replyText);
+    });
   }
 
   /**

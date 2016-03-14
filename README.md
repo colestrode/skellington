@@ -62,16 +62,35 @@ module.exports = function(controller, bot, expressApp) {
 
 Learn more about the botkit API in [the howdyai/botkit docs](https://github.com/howdyai/botkit/blob/master/readme.md).
 
-### Be Considerate: Namespace Data
+### Help Text
 
-There will potentially be several other plugins running in the same Skellington instance, so
-be considerate when you put things into the Botkit storage. Namespace your data and don't modify things you didn't set.
+You can optionally include help text for your plugin. To do this, export a `help` object with `command` and `text` properties.
+
+`command`: the command the user will use to get help about your plugin. For example if `command` is `funny gifs`, users
+will get help by typing `@bot help funny gifs`.
+
+`text`: either a string or a function. The string will be displayed as is. If text if a function, it will be passed an
+options object with the following properties: 
+
+| Property | Description |
+| ---------|-------------|
+| botName  | The user facing name of the bot. Useful if you have commands that require @-mentioning the bot. |
+| team     | The team ID the help message came from. | 
+| channel  | The channel ID the help message came from. | 
+| user     | The ID of the user who initiated the help message. |
+
+
+
+### Be Considerate With Data
+
+There will potentially be several other plugins running in the same Skellington instance, so be considerate when you put 
+things into the Botkit storage. Namespace any data specific to your plugin and don't modify things you didn't set.
 
 When you read from storage, remember to always merge your updates with what was present in storage before.
 Here's an example of how to do that using lodash's `merge` method:
 
 ```js
-var myTeamData = {myNamespace: 'some data'};
+var myTeamData = {funnyGifs: 'some data'};
 controller.storage.teams.get('teamId', function(err, team) {
   var mergedData = _.merge({id: 'teamId'}, team, myTeamData);
   controller.storage.teams.save(mergedData, function(err) {
@@ -83,4 +102,4 @@ controller.storage.teams.get('teamId', function(err, team) {
 ### Namespace Express Paths
 
 If you are writing slash commands and need access to the express server, use a namespaced path,
-like `/my-cool-bot/endpoint`. Don't add things to the root path, those are likely to conflict with another bot.
+like `/funny-gifs/endpoint`. Don't add things to the root path, those are likely to conflict with another bot.
