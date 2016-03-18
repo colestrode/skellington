@@ -48,15 +48,17 @@ Toggles debug mode for botkit. Defaults to `false`.
 
 ## Writing Bot Plugins
 
-Each plugin passed to Skellington should export a function that will take a botkit `controller`, `bot`,
+Each plugin passed to Skellington should export an object with an `init` function that will take a botkit `controller`, `bot`,
 and optionally an Express `app` (this will only exist if `config.port` was set):
 
 ```js
-module.exports = function(controller, bot, expressApp) {
-  // build your bot logic here!
-  controller.hears('hello', 'direct_mention', function(bot, message) {
-    bot.reply(message, 'Hi!');
-  });  
+module.exports = {
+  init: function(controller, bot, expressApp) {
+    // build your bot logic here!
+    controller.hears('hello', 'direct_mention', function(bot, message) {
+      bot.reply(message, 'Hi!');
+    });  
+  }
 };
 ```
 
@@ -64,7 +66,8 @@ Learn more about the botkit API in [the howdyai/botkit docs](https://github.com/
 
 ### Help Text
 
-You can optionally include help text for your plugin. To do this, export a `help` object with `command` and `text` properties.
+You can optionally include help text for your plugin. To do this, you will need a a `help` object with `command` and `text` 
+properties on your exported object. As in life, `help`` is optional, but it does make things easier.
 
 `command`: the command the user will use to get help about your plugin. For example if `command` is `funny gifs`, users
 will get help by typing `@bot help funny gifs`.
