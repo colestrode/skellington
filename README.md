@@ -35,7 +35,7 @@ An array of plugins. See [below](#writing-bot-plugins) for details.
 
 ### storage
 
-A storage module for Botkit. Defaults to the local file store.
+A storage module for Botkit. Defaults to the botkit default storage.
 
 ### port
 
