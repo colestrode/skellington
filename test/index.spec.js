@@ -4,6 +4,7 @@ let chai = require('chai');
 let expect = chai.expect;
 let sinon = require('sinon');
 let proxyquire = require('proxyquire').noCallThru();
+let _ = require('lodash');
 
 chai.use(require('sinon-chai'));
 
@@ -19,13 +20,15 @@ describe('Skellington', () => {
 
   beforeEach(() => {
 
-    connectedBotMock = {'team_info': {id: 'rickandmorty'}};
+    connectedBotMock = {'team_info': {id: 'rickandmorty'}, identity: {name: 'butter-passer'}};
 
     botMock = {
-      startRTM: sinon.stub()
+      startRTM: sinon.stub(),
+      reply: sinon.stub()
     };
 
     controllerMock = {
+      hears: sinon.stub(),
       spawn: sinon.stub().returns(botMock),
       log: sinon.stub(),
       on: sinon.stub()
@@ -105,38 +108,128 @@ describe('Skellington', () => {
 
       beforeEach(() => {
         botMock.startRTM.reset();
-        plugin = sinon.stub();
+        plugin = {
+          init: sinon.stub()
+        };
       });
 
       it('should initialize one plugin not in an array', () => {
         skellington({plugins: plugin, port: 1234});
         botMock.startRTM.args[0][0](null, connectedBotMock);
 
-        expect(plugin).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
+        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
       });
 
       it('should initialize one plugin in an array', () => {
         skellington({plugins: [plugin], port: 1234});
         botMock.startRTM.args[0][0](null, connectedBotMock);
 
-        expect(plugin).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
+        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
       });
 
       it('should initialize multiple plugins', () => {
-        let anotherExternalBot = sinon.stub();
+        let anotherExternalBot = {
+          init: sinon.stub()
+        };
 
         skellington({plugins: [plugin, anotherExternalBot], port: 1234});
         botMock.startRTM.args[0][0](null, connectedBotMock);
 
-        expect(plugin).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
-        expect(anotherExternalBot).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
+        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
+        expect(anotherExternalBot.init).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
       });
 
       it('should not pass an express app if port is not set', () => {
         skellington({plugins: [plugin]});
         botMock.startRTM.args[0][0](null, connectedBotMock);
 
-        expect(plugin).to.have.been.calledWith(controllerMock, connectedBotMock, undefined);
+        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, undefined);
+      });
+    });
+
+    describe('register help listeners', () => {
+      let plugin;
+      let messageMock;
+
+      beforeEach(() => {
+        botMock.startRTM.reset();
+        plugin = {
+          init: sinon.stub()
+        };
+
+        messageMock = {
+          team: 'crystal',
+          channel: 'blue',
+          user: 'persuasion'
+        };
+      });
+
+      function startRtm(plugins) {
+        skellington({plugins: plugins});
+        botMock.startRTM.args[0][0](null, connectedBotMock);
+      }
+
+      it('should register a listener if no plugins have help text', () => {
+        startRtm([plugin]);
+        expect(controllerMock.hears).to.have.been.calledOnce;
+
+        let callback = controllerMock.hears.args[0][2];
+
+        callback(botMock, messageMock);
+        expect(botMock.reply).to.have.been.calledWithMatch(messageMock, /^I can't help you/);
+      });
+
+      it('should register a listener for each plugin with help text', () => {
+        plugin.help = {
+          command: 'rick',
+          text: 'sanchez'
+        };
+
+        let anotherPlugin = {
+          init: sinon.stub(),
+          help: {
+            command: 'morty',
+            text: 'smith'
+          }
+        };
+
+        let aThirdPlugin = {init: sinon.stub()};
+
+        startRtm([plugin, anotherPlugin, aThirdPlugin]);
+        expect(controllerMock.hears.callCount).to.equal(3); // once for general help, twice for plugins with help text
+
+        // call all the callbacks
+        _.forEach(controllerMock.hears.args, function(args) {
+          args[2](botMock, messageMock);
+        });
+
+        expect(botMock.reply).to.have.been.calledWithMatch(messageMock, /^Here are some things/);
+        expect(botMock.reply).to.have.been.calledWith(messageMock, plugin.help.text);
+        expect(botMock.reply).to.have.been.calledWith(messageMock, anotherPlugin.help.text);
+      });
+
+      it('should handle a plugin help text callback', () => {
+        let helpTextCb = sinon.stub();
+
+        plugin.help = {
+          command: 'walter',
+          text: helpTextCb
+        };
+
+        botMock.identity = {name: 'rickandmorty'};
+
+        startRtm([plugin]);
+        // call all the callbacks
+        _.forEach(controllerMock.hears.args, function(args) {
+          args[2](botMock, messageMock);
+        });
+
+        expect(helpTextCb).to.have.been.calledWith({
+          botName: botMock.identity.name,
+          team: messageMock.team,
+          channel: messageMock.channel,
+          user: messageMock.user
+        });
       });
     });
   });
