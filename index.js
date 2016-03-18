@@ -7,7 +7,7 @@ let _ = require('lodash');
 module.exports = (config) => {
   _.defaults(config, {debug: false, plugins: [], slackToken: process.env.SLACK_API_TOKEN});
 
-  if (typeof config.plugins === 'function') {
+  if (!Array.isArray(config.plugins)) {
     config.plugins = [config.plugins];
   }
 
@@ -32,11 +32,11 @@ module.exports = (config) => {
   bot.startRTM((err, connectedBot) => {
     if (err) {
       logError(controller, err, 'Error connecting to RTM');
-      process.exit(1);
+      return process.exit(1); // need the return for tests which mock our process.exit
     }
 
     _.forEach(config.plugins, (plugin) => {
-      plugin(controller, connectedBot, server);
+      plugin.init(controller, connectedBot, server);
     });
 
     addHelpListeners(controller, connectedBot.identity.name, config.plugins);
@@ -76,12 +76,13 @@ module.exports = (config) => {
    * @param plugins
    */
   function addHelpListeners(controller, botName, plugins) {
-    let helpins = _.filter(plugins, 'help');
     let helpCommands = [];
 
-    _.forEach(helpins, function(helpin) {
-      helpCommands.push('`@' + botName + ' help ' + helpin.help.command + '`');
-      registerHelpListener(controller, helpin.help);
+    _.forEach(plugins, function(plugin) {
+      if (plugin.help && plugin.help.text && plugin.help.command) {
+        helpCommands.push('`@' + botName + ' help ' + plugin.help.command + '`');
+        registerHelpListener(controller, plugin.help);
+      }
     });
     helpCommands = helpCommands.join('\n');
 
@@ -105,6 +106,7 @@ module.exports = (config) => {
 
       if (typeof helpInfo.text === 'function') {
         let helpOpts = _.merge({botName: bot.identity.name}, _.pick(message, ['team', 'channel', 'user']));
+
         replyText = helpInfo.text(helpOpts);
       }
 
