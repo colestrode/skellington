@@ -24,7 +24,10 @@ describe('Skellington', () => {
 
     botMock = {
       startRTM: sinon.stub(),
-      reply: sinon.stub()
+      reply: sinon.stub(),
+      identity: {
+        name: 'gazorpazorp'
+      }
     };
 
     controllerMock = {

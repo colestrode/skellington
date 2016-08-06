@@ -39,7 +39,7 @@ module.exports = (config) => {
       plugin.init(controller, connectedBot, server);
     });
 
-    addHelpListeners(controller, connectedBot.identity.name, config.plugins);
+    addHelpListeners(controller, config.plugins);
   });
 
   // restart if disconnected
@@ -75,18 +75,21 @@ module.exports = (config) => {
    * @param botName
    * @param plugins
    */
-  function addHelpListeners(controller, botName, plugins) {
-    let helpCommands = [];
+  function addHelpListeners(controller, plugins) {
 
     _.forEach(plugins, function(plugin) {
-      if (plugin.help && plugin.help.text && plugin.help.command) {
-        helpCommands.push('`@' + botName + ' help ' + plugin.help.command + '`');
+      if (_.get(plugin, 'help.text') && _.get(plugin, 'help.command')) {
         registerHelpListener(controller, plugin.help);
       }
     });
-    helpCommands = helpCommands.join('\n');
 
     controller.hears('^help$', 'direct_mention,direct_message', function(bot, message) {
+      let helpCommands = _.chain(plugins)
+        .filter((plugin) => !!_.get(plugin, 'help.command'))
+        .map((plugin) => '`@' + bot.identity.name + ' help ' + _.get(plugin, 'help.command') + '`')
+        .value()
+        .join('\n');
+
       if (!helpCommands.length) {
         return bot.reply(message, 'I can\'t help you with anything right now. I still like you though :heart:');
       }
