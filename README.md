@@ -27,7 +27,7 @@ require('skellington')({
 
 ### slackToken
 
-Defaults to `process.env.SLACK_API_TOKEN`.
+If this is a single team bot, the Slack API token used to connect to the Slack API.
 
 ### plugins
 

@@ -3,10 +3,9 @@
 let Botkit = require('botkit');
 let express = require('express');
 let _ = require('lodash');
-let botCache = new Map(); // map of token to bot
 
 module.exports = (config) => {
-  _.defaults(config, {debug: false, plugins: [], slackToken: process.env.SLACK_API_TOKEN});
+  _.defaults(config, {debug: false, plugins: []});
 
   if (!Array.isArray(config.plugins)) {
     config.plugins = [config.plugins];
@@ -32,6 +31,7 @@ module.exports = (config) => {
   let bot = controller.spawn({
     token: config.slackToken
   });
+
   bot.startRTM((err, connectedBot) => {
     if (err) {
       logError(controller, err, 'Error connecting to RTM');
@@ -105,6 +105,7 @@ module.exports = (config) => {
    * @param helpInfo
    */
   function registerHelpListener(controller, helpInfo) {
+    console.log('registerHelpListener');
     controller.hears('^help ' + helpInfo.command + '$', 'direct_mention,direct_message', function(bot, message) {
       let replyText = helpInfo.text;
 
