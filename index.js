@@ -3,6 +3,7 @@
 let Botkit = require('botkit');
 let express = require('express');
 let _ = require('lodash');
+let botCache = new Map(); // map of token to bot
 
 module.exports = (config) => {
   _.defaults(config, {debug: false, plugins: [], slackToken: process.env.SLACK_API_TOKEN});
@@ -21,14 +22,16 @@ module.exports = (config) => {
 
   let server;
   let controller = Botkit.slackbot(slackbotConfig);
-  let bot = controller.spawn({
-    token: config.slackToken
-  });
 
   if (config.port) {
     server = startServer(config, controller);
   }
 
+  addHelpListeners(controller, config.plugins);
+
+  let bot = controller.spawn({
+    token: config.slackToken
+  });
   bot.startRTM((err, connectedBot) => {
     if (err) {
       logError(controller, err, 'Error connecting to RTM');
@@ -38,12 +41,10 @@ module.exports = (config) => {
     _.forEach(config.plugins, (plugin) => {
       plugin.init(controller, connectedBot, server);
     });
-
-    addHelpListeners(controller, config.plugins);
   });
 
   // restart if disconnected
-  controller.on('rtm_close', () => {
+  controller.on('rtm_close', (bot) => {
     controller.log('rtm closed, attempting to reconnect');
     bot.startRTM((err) =>{
       if (err) {
