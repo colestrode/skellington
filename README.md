@@ -1,8 +1,9 @@
-# skellington
+<img src="site/assets/images/logo-0.1-horizontal.png" alt="Skellington: the logo is jack the chat bubble, get it???" style="max-width: 500px; display:block; margin: 0 0 20px;">
+
 [![Build Status](https://travis-ci.org/colestrode/skellington.svg?branch=master)](https://travis-ci.org/colestrode/skellington)
 [![Coverage Status](https://coveralls.io/repos/github/colestrode/skellington/badge.svg?branch=master)](https://coveralls.io/github/colestrode/skellington?branch=master)
 
-:sparkles::skull::sparkles: The skeleton for your bots.
+The skeleton for your bots.
 
 ## Composable Botkit Bots
 
@@ -66,27 +67,27 @@ Learn more about the botkit API in [the howdyai/botkit docs](https://github.com/
 
 ### Help Text
 
-You can optionally include help text for your plugin. To do this, you will need a a `help` object with `command` and `text` 
+You can optionally include help text for your plugin. To do this, you will need a a `help` object with `command` and `text`
 properties on your exported object. As in life, `help` is optional, but it does make things easier.
 
 `command`: the command the user will use to get help about your plugin. For example if `command` is `funny gifs`, users
 will get help by typing `@bot help funny gifs`.
 
 `text`: either a string or a function. The string will be displayed as is. If text if a function, it will be passed an
-options object with the following properties: 
+options object with the following properties:
 
 | Property | Description |
 | ---------|-------------|
 | botName  | The user facing name of the bot. Useful if you have commands that require @-mentioning the bot. |
-| team     | The team ID the help message came from. | 
-| channel  | The channel ID the help message came from. | 
+| team     | The team ID the help message came from. |
+| channel  | The channel ID the help message came from. |
 | user     | The ID of the user who initiated the help message. |
 
 
 
 ### Be Considerate With Data
 
-There will potentially be several other plugins running in the same Skellington instance, so be considerate when you put 
+There will potentially be several other plugins running in the same Skellington instance, so be considerate when you put
 things into the Botkit storage. Namespace any data specific to your plugin and don't modify things you didn't set.
 
 When you read from storage, remember to always merge your updates with what was present in storage before.
