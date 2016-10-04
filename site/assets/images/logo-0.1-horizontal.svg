@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1675px" height="310px" viewBox="0 0 1675 310" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 40.1 (33804) - http://www.bohemiancoding.com/sketch -->
+    <title>londrina-solid-horizontal</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M134.317259,264.537373 C159.155515,264.537373 183.224627,259.584853 204.504381,250.316828 C216.573406,245.060375 233,284 285.651128,279.499172 C263,256 259.706498,209.55072 267.324913,196.504579 C277.29216,179.436186 283,159.549302 283,137.300647 C283,59.0895291 216.056922,0 137.908629,0 C59.7603373,0 0,59.0895291 0,137.300647 C0,215.511765 56.1689668,264.537373 134.317259,264.537373 Z" id="path-1"></path>
+        <mask id="mask-2" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="-14.7" y="-14.7" width="315.051128" height="309.26217">
+            <rect x="-14.7" y="-14.7" width="315.051128" height="309.26217" fill="white"></rect>
+            <use xlink:href="#path-1" fill="black"></use>
+        </mask>
+    </defs>
+    <g id="Page-3" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Londrina-Solid" transform="translate(-205.000000, -357.000000)">
+            <g id="londrina-solid-horizontal" transform="translate(220.000000, 355.000000)">
+                <g id="Jack" transform="translate(0.000000, 17.000000)">
+                    <g id="Oval">
+                        <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                        <use stroke="#100F0F" mask="url(#mask-2)" stroke-width="29.4" stroke-linecap="round" stroke-linejoin="round" xlink:href="#path-1"></use>
+                    </g>
+                    <path d="M65.1460396,149.325397 C91.0665127,149.325397 112.079208,132.062302 112.079208,110.767196 C112.079208,89.4720893 91.0665127,62.3941799 65.1460396,62.3941799 C39.2255665,62.3941799 18.2128713,89.4720893 18.2128713,110.767196 C18.2128713,132.062302 39.2255665,149.325397 65.1460396,149.325397 Z" id="Oval-2" fill="#171616"></path>
+                    <path d="M185.303033,129.073993 C211.223507,129.073993 232.236202,111.810898 232.236202,90.5157915 C232.236202,69.2206851 211.223507,42.1427757 185.303033,42.1427757 C159.38256,42.1427757 138.369865,69.2206851 138.369865,90.5157915 C138.369865,111.810898 159.38256,129.073993 185.303033,129.073993 Z" id="Oval-2-Copy" fill="#171616" transform="translate(185.303033, 85.608384) rotate(25.000000) translate(-185.303033, -85.608384) "></path>
+                    <path d="M150.556931,150.798942 C155.282793,150.798942 158.113861,149.14294 158.113861,143.399471 C158.113861,137.656002 154.282793,133 149.556931,133 C144.831068,133 141,137.656002 141,143.399471 C141,149.14294 145.831068,150.798942 150.556931,150.798942 Z" id="Oval-3" fill="#181616"></path>
+                    <path d="M120.460396,157.293651 C125.685228,157.293651 129.920792,154.422335 129.920792,149.646825 C129.920792,144.871316 125.685228,141 120.460396,141 C115.235564,141 113,144.871316 113,149.646825 C113,154.422335 115.235564,157.293651 120.460396,157.293651 Z" id="Oval-3-Copy" fill="#181616"></path>
+                    <path d="M37.8267327,199.100529 C37.8267327,199.100529 92.8155941,229.94709 156.486907,220.833333 C220.15822,211.719577 257.782178,154.232804 257.782178,154.232804" id="Line" stroke="#171616" stroke-width="13.5" stroke-linecap="round"></path>
+                    <path d="M79.3218473,196.646825 L60.0766675,226.792328" id="Line" stroke="#131313" stroke-width="12.3999996" stroke-linecap="round"></path>
+                    <path d="M115.931931,205.410053 L102.272277,238.710317" id="Line-Copy" stroke="#131313" stroke-width="12.3999996" stroke-linecap="round"></path>
+                    <path d="M145.002475,204.007937 L157.961634,237.308201" id="Line-Copy-2" stroke="#131313" stroke-width="12.3999996" stroke-linecap="round"></path>
+                    <path d="M184.930693,191.388889 L206.996287,221.183862" id="Line-Copy-3" stroke="#131313" stroke-width="12.3999996" stroke-linecap="round"></path>
+                    <path d="M215.752475,167.55291 L245.523515,191.739418" id="Line-Copy-4" stroke="#131313" stroke-width="12.3999996" stroke-linecap="round"></path>
+                </g>
+                <text id="skellington" font-family="LondrinaSolid-Regular, Londrina Solid" font-size="240" font-weight="normal" letter-spacing="25.5999947" fill="#000000">
+                    <tspan x="421.320029" y="227">skellington</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>
