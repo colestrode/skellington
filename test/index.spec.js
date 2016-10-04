@@ -194,8 +194,6 @@ describe('Skellington', function() {
 
       skellington({plugins: [plugin, anotherPlugin, aThirdPlugin]});
 
-      console.log('callcount', controllerMock.hears.callCount);
-
       expect(controllerMock.hears.callCount).to.equal(3); // once for general help, twice for plugins with help text
 
       // call all the callbacks
