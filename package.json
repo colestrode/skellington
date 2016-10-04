@@ -4,7 +4,7 @@
   "description": "A plugable bot system for botkit",
   "main": "index.js",
   "scripts": {
-    "pretest": "eslint index.js test/",
+    "pretest": "standard index.js test/**/*.spec.js --fix",
     "test": "istanbul cover --report lcov --dir ./coverage/ _mocha --recursive ./test --grep ./test/**/*.spec.js -- --colors --reporter spec",
     "ci": "npm test && cat ./coverage/lcov.info | coveralls"
   },
@@ -29,11 +29,21 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "coveralls": "^2.11.8",
-    "eslint": "^3.2.0",
     "istanbul": "^0.4.2",
     "mocha": "^3.0.0",
     "proxyquire": "^1.7.4",
     "sinon": "^1.17.3",
-    "sinon-chai": "^2.8.0"
+    "sinon-chai": "^2.8.0",
+    "standard": "^8.3.0"
+  },
+  "standard": {
+    "globals": [
+      "after",
+      "afterEach",
+      "before",
+      "beforeEach",
+      "describe",
+      "it"
+    ]
   }
 }
