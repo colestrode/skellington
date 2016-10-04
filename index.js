@@ -2,7 +2,6 @@
 
 let Botkit = require('botkit');
 let _ = require('lodash');
-let express = require('express');
 
 module.exports = (config) => {
   _.defaults(config, {debug: false, plugins: []});
@@ -20,19 +19,15 @@ module.exports = (config) => {
   }
 
   let controller = Botkit.slackbot(slackbotConfig);
-  let server;
 
   addHelpListeners(controller, config.plugins);
-
-  if (config.port) {
-    server = startServer(config, controller);
-  }
+  startServer(config, controller);
 
   let bot = controller.spawn({
     token: config.slackToken
   });
 
-  startRtm(config, controller, bot, server);
+  startRtm(config, controller, bot);
 
   // restart if disconnected
   controller.on('rtm_close', (bot) => {
@@ -54,11 +49,10 @@ module.exports = (config) => {
  * @param controller
  */
 function startServer(config, controller) {
-  let expressApp = express();
-
-  expressApp.listen(config.port);
-  controller.log('listening on port ' + config.port);
-  return expressApp;
+  // TODO port will be required for multi-team auth
+  if (config.port) {
+    controller.setupWebserver(config.port);
+  }
 }
 
 /**
@@ -110,7 +104,7 @@ function registerHelpListener(controller, helpInfo) {
   });
 }
 
-function startRtm(config, controller, bot, server) {
+function startRtm(config, controller, bot) {
   bot.startRTM((err, connectedBot) => {
     if (err) {
       logError(controller, err, 'Error connecting to RTM');
@@ -118,7 +112,7 @@ function startRtm(config, controller, bot, server) {
     }
 
     _.forEach(config.plugins, (plugin) => {
-      plugin.init(controller, connectedBot, server);
+      plugin.init(controller, connectedBot, controller.webserver);
     });
   });
 }
