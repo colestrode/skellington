@@ -12,7 +12,6 @@ describe('Skellington', function() {
   let skellington;
   let botkitMock;
   let controllerMock;
-  let expressMock;
   let expressAppMock;
   let botMock;
   let connectedBotMock;
@@ -30,28 +29,26 @@ describe('Skellington', function() {
       }
     };
 
+    expressAppMock = {};
+
     controllerMock = {
       hears: sinon.stub(),
       spawn: sinon.stub().returns(botMock),
       log: sinon.stub(),
-      on: sinon.stub()
+      on: sinon.stub(),
+      setupWebserver: sinon.stub(),
+      webserver: expressAppMock
     };
 
     botkitMock = {
       slackbot: sinon.stub().returns(controllerMock)
     };
 
-    expressAppMock = {
-      listen: sinon.stub()
-    };
-    expressMock = sinon.stub().returns(expressAppMock);
-
     exitOrig = process.exit;
     process.exit = sinon.stub();
 
     skellington = proxyquire('../index', {
-      'botkit': botkitMock,
-      'express': expressMock
+      'botkit': botkitMock
     });
   });
 
@@ -65,9 +62,9 @@ describe('Skellington', function() {
       skellington({slackToken: 'abc123'});
 
       expect(botkitMock.slackbot).to.have.been.calledWith({debug: false});
-      expect(expressMock).not.to.have.been.called;
       expect(botMock.startRTM).to.be.called;
       expect(controllerMock.on).to.be.calledWithMatch('rtm_close');
+      expect(controllerMock.setupWebserver).not.to.be.called;
     });
 
     it('should allow passed in configs', function() {
@@ -82,7 +79,7 @@ describe('Skellington', function() {
 
       expect(botkitMock.slackbot).to.have.been.calledWith({debug: true, storage: storageMock});
       expect(controllerMock.spawn).to.have.been.calledWith({token: 'abc123'});
-      expect(expressAppMock.listen).to.have.been.calledWith(1234);
+      expect(controllerMock.setupWebserver).to.be.calledWith(1234);
     });
   });
 
@@ -138,15 +135,7 @@ describe('Skellington', function() {
         expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
         expect(anotherExternalBot.init).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock);
       });
-
-      it('should not pass an express app if port is not set', function() {
-        skellington({plugins: [plugin]});
-        botMock.startRTM.args[0][0](null, connectedBotMock);
-
-        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, undefined);
-      });
     });
-
   });
 
   describe('register help listeners', function() {
