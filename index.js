@@ -2,43 +2,102 @@
 
 const Botkit = require('botkit')
 const _ = require('lodash')
+const connectedBots = new Set()
 
 module.exports = (config) => {
+  let controller = Botkit.slackbot(getSlackbotConfig(config))
+
+  validateConfig(config, controller);
+  addHelpListeners(controller, config.plugins)
+
+  if (config.port) {
+    startServer(controller, config.port)
+  }
+
+  if (config.clientId && config.clientSecret) {
+    startSlackApp(config, controller)
+  } else if (config.slackToken) {
+    startSingleBot(config, controller)
+  }
+
+  // used for slack apps that will connect multiple bots
+  controller.on('create_bot', (bot) => {
+    // keep track of bots
+    if (!connectedBots.has(bot)) {
+      startRtm(controller, bot, function() {
+        connectedBots.add(bot)
+        botConnected(config.plugins, controller, bot)
+        controller.log('bot added!')
+      })
+    }
+  })
+
+  // restart if disconnected
+  controller.on('rtm_close', (bot) => {
+    controller.log('rtm closed, attempting to reconnect')
+    startRtm(controller, bot)
+  })
+}
+
+function validateConfig(config, controller) {
   _.defaults(config, {debug: false, plugins: []})
 
   if (!Array.isArray(config.plugins)) {
     config.plugins = [config.plugins]
   }
 
-  let slackbotConfig = {
-    debug: config.debug
+  if (!config.slackToken && !(config.clientId && config.clientSecret && config.port)) {
+    logError(controller, new Error('Missing configuration. Config must include either slackToken AND/OR clientId, clientSecret, and port'))
+    process.exit(1)
   }
+}
 
-  if (config.storage) {
-    slackbotConfig.storage = config.storage
-  }
+function getSlackbotConfig(config) {
+  // these are all optional
+  return _.pick(config, ['debug', 'storage', 'logger', 'json_file_store'])
+}
 
-  let controller = Botkit.slackbot(slackbotConfig)
-
-  addHelpListeners(controller, config.plugins)
-  startServer(config, controller)
-
-  // TODO single bot flow
+function startSingleBot(config, controller) {
   let bot = controller.spawn({
     token: config.slackToken
   })
-  startRtm(config, controller, bot)
 
-  // restart if disconnected
-  controller.on('rtm_close', (bot) => {
-    controller.log('rtm closed, attempting to reconnect')
-    bot.startRTM((err) => {
-      if (err) {
-        logError(controller, err, 'could not reconnect to the rtm, shutting down')
-        process.exit(1)
+  startRtm(controller, bot, (connectedBot) => {
+    connectedBot.add(connectedBot)
+    initializePlugins(config.plugins, controller, connectedBot)
+    botConnected(config.plugins, controller, connectedBot)
+  })
+}
+
+function startSlackApp(config, controller) {
+  let scopes = _.isArray(config.scopes) ? config.scopes : ['bot']
+
+  controller.configureSlackApp({
+    clientId: config.clientId,
+    clientSecret: config.clientSecret,
+    redirectUri: config.redirectUri, // optional
+    scopes: _.uniq(scopes)
+  })
+
+  initializePlugins(config.plugins, controller, null)
+
+  controller.storage.teams.all((err, teams) => {
+    if (err) {
+      logError(controller, err, 'Could not reconnect teams')
+      return process.exit(1);
+    }
+
+    _.forEach(teams, (team) => {
+      if (team.bot) {
+        let bot = controller.spawn(team)
+        startRtm(controller, bot, function() {
+          connectedBots.add(bot);
+          botConnected(config.plugins, controller, bot)
+          controller.log('bot added from storage')
+        })
       }
     })
-  })
+  });
 }
 
 /**
@@ -47,11 +106,21 @@ module.exports = (config) => {
  * @param config
  * @param controller
  */
-function startServer (config, controller) {
-  // TODO port will be required for multi-team auth
-  if (config.port) {
-    controller.setupWebserver(config.port)
-  }
+function startServer (controller, port) {
+  controller.setupWebserver(port, (err) => {
+    if (err) {
+      return logError(controller, err, `Error setting up server on port ${port}`)
+    }
+
+    controller.createWebhookEndpoints(controller.webserver)
+
+    controller.createOauthEndpoints(controller.webserver, (err, req, res) => {
+      if (err) {
+        return res.status(500).send('ERROR: ' + err)
+      }
+      res.send({message: 'Success!'})
+    })
+  });
 }
 
 /**
@@ -105,20 +174,20 @@ function registerHelpListener (controller, helpInfo) {
 /**
  * Starts an RTM connection for a bot
  *
- * @param config
  * @param controller
  * @param bot
+ * @param cb
  */
-function startRtm (config, controller, bot) {
+function startRtm (controller, bot, cb) {
+  cb = cb || function() {}
+
   bot.startRTM((err, connectedBot) => {
     if (err) {
       logError(controller, err, 'Error connecting to RTM')
       return process.exit(1) // need the return for tests which mock our process.exit
     }
 
-    // TODO only call initializePlugins here for a single bot instance
-    initializePlugins(config.plugins, controller, connectedBot)
-    botConnected(config.plugins, controller, connectedBot)
+    cb(connectedBot)
   })
 }
 
