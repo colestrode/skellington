@@ -7,7 +7,7 @@ const connectedBots = new Set()
 module.exports = (config) => {
   let controller = Botkit.slackbot(getSlackbotConfig(config))
 
-  validateConfig(config, controller);
+  validateConfig(config, controller)
   addHelpListeners(controller, config.plugins)
 
   if (config.port) {
@@ -24,7 +24,7 @@ module.exports = (config) => {
   controller.on('create_bot', (bot) => {
     // keep track of bots
     if (!connectedBots.has(bot)) {
-      startRtm(controller, bot, function() {
+      startRtm(controller, bot, () => {
         connectedBots.add(bot)
         botConnected(config.plugins, controller, bot)
         controller.log('bot added!')
@@ -39,8 +39,14 @@ module.exports = (config) => {
   })
 }
 
-function validateConfig(config, controller) {
-  _.defaults(config, {debug: false, plugins: []})
+/**
+ * Validates that required params are passed, will exit the process with an error if required config is missing
+ *
+ * @param config
+ * @param controller
+ */
+function validateConfig (config, controller) {
+  _.defaults(config, {debug: false, plugins: [], status_optout: true})
 
   if (!Array.isArray(config.plugins)) {
     config.plugins = [config.plugins]
@@ -52,12 +58,24 @@ function validateConfig(config, controller) {
   }
 }
 
-function getSlackbotConfig(config) {
-  // these are all optional
-  return _.pick(config, ['debug', 'storage', 'logger', 'json_file_store'])
+/**
+ * Given the passed config, returns an object with values relevant to configuring a Botkit slack bot
+ *
+ * @param config
+ * @returns {{}}
+ */
+function getSlackbotConfig (config) {
+  // omit config values not needed to configure a slackbot
+  return _.omit(config, ['clientId', 'clientSecret', 'plugins', 'redirectUrl', 'scopes', 'slackToken'])
 }
 
-function startSingleBot(config, controller) {
+/**
+ * Starts a single-team bot, i.e., not a Slack app (no slash commands, no incoming webhooks, etc.)
+ *
+ * @param config
+ * @param controller
+ */
+function startSingleBot (config, controller) {
   let bot = controller.spawn({
     token: config.slackToken
   })
@@ -69,7 +87,13 @@ function startSingleBot(config, controller) {
   })
 }
 
-function startSlackApp(config, controller) {
+/**
+ * Starts a slack app and adds support for a incoming webhooks, slash commands, and bot users that can be invited to multiple teams
+ *
+ * @param config
+ * @param controller
+ */
+function startSlackApp (config, controller) {
   let scopes = _.isArray(config.scopes) ? config.scopes : ['bot']
 
   controller.configureSlackApp({
@@ -84,24 +108,24 @@ function startSlackApp(config, controller) {
   controller.storage.teams.all((err, teams) => {
     if (err) {
       logError(controller, err, 'Could not reconnect teams')
-      return process.exit(1);
+      return process.exit(1)
     }
 
     _.forEach(teams, (team) => {
-      if (team.bot) {
-        let bot = controller.spawn(team)
-        startRtm(controller, bot, function() {
-          connectedBots.add(bot);
-          botConnected(config.plugins, controller, bot)
-          controller.log('bot added from storage')
-        })
-      }
+      if (!team.bot) return;
+
+      let bot = controller.spawn(team)
+      startRtm(controller, bot, () => {
+        connectedBots.add(bot)
+        botConnected(config.plugins, controller, bot)
+        controller.log('bot added from storage')
+      })
     })
-  });
+  })
 }
 
 /**
- * Starts an express server for slash commands
+ * Starts an express server for slash commands, incoming webhooks, and OAuth flow
  *
  * @param config
  * @param controller
@@ -112,15 +136,17 @@ function startServer (controller, port) {
       return logError(controller, err, `Error setting up server on port ${port}`)
     }
 
-    controller.createWebhookEndpoints(controller.webserver)
+    controller.createWebhookEndpoints(controller.webserver) // synchronous method
 
     controller.createOauthEndpoints(controller.webserver, (err, req, res) => {
       if (err) {
-        return res.status(500).send('ERROR: ' + err)
+        logError(controller, err, `Error setting up OAuth endpoints`)
+        return res.status(500).send({message: `Error setting up OAuth endpoints`})
       }
-      res.send({message: 'Success!'})
+      // TODO need to redirect
+      res.send({message: `Success!`})
     })
-  });
+  })
 }
 
 /**
@@ -131,13 +157,13 @@ function startServer (controller, port) {
  * @param plugins
  */
 function addHelpListeners (controller, plugins) {
-  _.forEach(plugins, function (plugin) {
+  _.forEach(plugins, (plugin) => {
     if (_.get(plugin, 'help.text') && _.get(plugin, 'help.command')) {
       registerHelpListener(controller, plugin.help)
     }
   })
 
-  controller.hears('^help$', 'direct_mention,direct_message', function (bot, message) {
+  controller.hears('^help$', 'direct_mention,direct_message', (bot, message) => {
     let helpCommands = _.chain(plugins)
       .filter((plugin) => !!_.get(plugin, 'help.command'))
       .map((plugin) => '`@' + bot.identity.name + ' help ' + _.get(plugin, 'help.command') + '`')
@@ -154,11 +180,12 @@ function addHelpListeners (controller, plugins) {
 
 /**
  * Adds a single help listener for a plugin
+ *
  * @param controller
  * @param helpInfo
  */
 function registerHelpListener (controller, helpInfo) {
-  controller.hears('^help ' + helpInfo.command + '$', 'direct_mention,direct_message', function (bot, message) {
+  controller.hears('^help ' + helpInfo.command + '$', 'direct_mention,direct_message', (bot, message) => {
     let replyText = helpInfo.text
 
     if (typeof helpInfo.text === 'function') {
@@ -179,7 +206,7 @@ function registerHelpListener (controller, helpInfo) {
  * @param cb
  */
 function startRtm (controller, bot, cb) {
-  cb = cb || function() {}
+  cb = cb || function () {}
 
   bot.startRTM((err, connectedBot) => {
     if (err) {
