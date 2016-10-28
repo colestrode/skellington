@@ -10,15 +10,7 @@ module.exports = (config) => {
     config.plugins = [config.plugins]
   }
 
-  let slackbotConfig = {
-    debug: config.debug
-  }
-
-  if (config.storage) {
-    slackbotConfig.storage = config.storage
-  }
-
-  let controller = Botkit.slackbot(slackbotConfig)
+  let controller = Botkit.slackbot(getSlackbotConfig(config))
 
   addHelpListeners(controller, config.plugins)
   startServer(config, controller)
@@ -39,6 +31,17 @@ module.exports = (config) => {
       }
     })
   })
+}
+
+/**
+ * Given the passed config, returns an object with values relevant to configuring a Botkit slack bot
+ *
+ * @param config
+ * @returns {{}}
+ */
+function getSlackbotConfig (config) {
+  // omit config values not needed to configure a slackbot
+  return _.omit(config, ['clientId', 'clientSecret', 'plugins', 'port', 'redirectUrl', 'scopes', 'slackToken'])
 }
 
 /**

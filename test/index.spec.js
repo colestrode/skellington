@@ -72,7 +72,11 @@ describe('Skellington', function () {
         slackToken: 'abc123',
         debug: true,
         port: 1234,
-        storage: storageMock
+        storage: storageMock,
+        clientId: '123',
+        clientSecret: 'shhhh!',
+        redirectUrl: 'https://dont.evenworryabout.it',
+        scopes: ['peri']
       })
 
       expect(botkitMock.slackbot).to.have.been.calledWith({debug: true, storage: storageMock})
