@@ -12,10 +12,9 @@ describe('Skellington', function () {
   let skellington
   let botkitMock
   let controllerMock
-  let expressAppMock
   let botMock
   let connectedBotMock
-  let exitOrig
+  let storageMock
 
   beforeEach(function () {
     connectedBotMock = {'team_info': {id: 'rickandmorty'}, identity: {name: 'butter-passer'}}
@@ -28,23 +27,30 @@ describe('Skellington', function () {
       }
     }
 
-    expressAppMock = {}
+    storageMock = {
+      teams: {
+        all: sinon.stub().yields(null)
+      }
+    }
 
     controllerMock = {
       hears: sinon.stub(),
       spawn: sinon.stub().returns(botMock),
       log: sinon.stub(),
       on: sinon.stub(),
+      configureSlackApp: sinon.stub(),
       setupWebserver: sinon.stub(),
-      webserver: expressAppMock
+      createWebhookEndpoints: sinon.stub(),
+      createOauthEndpoints: sinon.stub(),
+      webserver: 'webserver',
+      storage: storageMock
     }
 
     botkitMock = {
       slackbot: sinon.stub().returns(controllerMock)
     }
 
-    exitOrig = process.exit
-    process.exit = sinon.stub()
+    sinon.stub(process, 'exit')
 
     skellington = proxyquire('../index', {
       'botkit': botkitMock
@@ -52,7 +58,7 @@ describe('Skellington', function () {
   })
 
   afterEach(function () {
-    process.exit = exitOrig
+    process.exit.restore()
   })
 
   describe('init', function () {
@@ -112,14 +118,14 @@ describe('Skellington', function () {
         skellington({plugins: plugin, port: 1234})
         botMock.startRTM.args[0][0](null, connectedBotMock)
 
-        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock)
+        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, controllerMock.webserver)
       })
 
       it('should initialize one plugin in an array', function () {
         skellington({plugins: [plugin], port: 1234})
         botMock.startRTM.args[0][0](null, connectedBotMock)
 
-        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock)
+        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, controllerMock.webserver)
       })
 
       it('should initialize multiple plugins', function () {
@@ -130,8 +136,8 @@ describe('Skellington', function () {
         skellington({plugins: [plugin, anotherExternalBot], port: 1234})
         botMock.startRTM.args[0][0](null, connectedBotMock)
 
-        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock)
-        expect(anotherExternalBot.init).to.have.been.calledWith(controllerMock, connectedBotMock, expressAppMock)
+        expect(plugin.init).to.have.been.calledWith(controllerMock, connectedBotMock, controllerMock.webserver)
+        expect(anotherExternalBot.init).to.have.been.calledWith(controllerMock, connectedBotMock, controllerMock.webserver)
       })
     })
   })

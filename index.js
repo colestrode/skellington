@@ -112,7 +112,7 @@ function startSlackApp (config, controller) {
     }
 
     _.forEach(teams, (team) => {
-      if (!team.bot) return;
+      if (!team.bot) return
 
       let bot = controller.spawn(team)
       startRtm(controller, bot, () => {
