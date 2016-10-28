@@ -33,6 +33,12 @@ module.exports = (config) => {
   })
 }
 
+/**
+ * Given the passed config, returns an object with values relevant to configuring a Botkit slack bot
+ *
+ * @param config
+ * @returns {{}}
+ */
 function getSlackbotConfig (config) {
   // omit config values not needed to configure a slackbot
   return _.omit(config, ['clientId', 'clientSecret', 'plugins', 'port', 'redirectUrl', 'scopes', 'slackToken'])
