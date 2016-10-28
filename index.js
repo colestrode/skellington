@@ -81,7 +81,7 @@ function startSingleBot (config, controller) {
   })
 
   startRtm(controller, bot, (connectedBot) => {
-    connectedBot.add(connectedBot)
+    connectedBots.add(connectedBot)
     initializePlugins(config.plugins, controller, connectedBot)
     botConnected(config.plugins, controller, connectedBot)
   })
