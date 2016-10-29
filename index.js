@@ -52,6 +52,13 @@ function validateConfig (config, controller) {
     config.plugins = [config.plugins]
   }
 
+  config.scopes = _.chain(config.plugins)
+    .map('scopes')
+    .flatten()
+    .concat(_.isArray(config.scopes) ? config.scopes : [])
+    .uniq()
+    .value()
+
   if (!config.slackToken && !(config.clientId && config.clientSecret && config.port)) {
     logError(controller, new Error('Missing configuration. Config must include either slackToken AND/OR clientId, clientSecret, and port'))
     process.exit(1)
@@ -66,7 +73,7 @@ function validateConfig (config, controller) {
  */
 function getSlackbotConfig (config) {
   // omit config values not needed to configure a slackbot
-  return _.omit(config, ['clientId', 'clientSecret', 'plugins', 'redirectUrl', 'scopes', 'slackToken'])
+  return _.omit(config, ['clientId', 'clientSecret', 'plugins', 'port', 'redirectUri', 'scopes', 'slackToken', 'state'])
 }
 
 /**
@@ -94,13 +101,12 @@ function startSingleBot (config, controller) {
  * @param controller
  */
 function startSlackApp (config, controller) {
-  let scopes = _.isArray(config.scopes) ? config.scopes : ['bot']
-
   controller.configureSlackApp({
     clientId: config.clientId,
     clientSecret: config.clientSecret,
     redirectUri: config.redirectUri, // optional
-    scopes: _.uniq(scopes)
+    state: config.state,
+    scopes: config.scopes
   })
 
   initializePlugins(config.plugins, controller, null)
@@ -144,7 +150,7 @@ function startServer (controller, port) {
         return res.status(500).send({message: `Error setting up OAuth endpoints`})
       }
       // TODO need to redirect
-      res.send({message: `Success!`})
+      res.status(200).send({message: `Success!`})
     })
   })
 }
@@ -166,7 +172,7 @@ function addHelpListeners (controller, plugins) {
   controller.hears('^help$', 'direct_mention,direct_message', (bot, message) => {
     let helpCommands = _.chain(plugins)
       .filter((plugin) => !!_.get(plugin, 'help.command'))
-      .map((plugin) => '`@' + bot.identity.name + ' help ' + _.get(plugin, 'help.command') + '`')
+      .map((plugin) => `\`@${bot.identity.name} help ${_.get(plugin, 'help.command')}\``)
       .value()
       .join('\n')
 
@@ -229,7 +235,6 @@ function initializePlugins (plugins, controller, bot) {
   bot = bot || null // bot may be undefined for multi-teams
   _.forEach(plugins, (plugin) => {
     if (_.isFunction(plugin.init)) {
-      // this interface is deprecated, but keep it for legacy bots
       try {
         plugin.init(controller, bot, controller.webserver)
       } catch (err) {
