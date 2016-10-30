@@ -8,7 +8,7 @@ The skeleton for your Slack bots.
 ## Composable Slack Bots
 
 Skellington is a skeleton for your [Botkit](https://github.com/howdyai/botkit) bots. It handles the boilerplate connection
-and error handling and let's you get down to the business of bot-making. You can write a new bot in a handfule of lines of code! 
+and error handling and let's you get down to the business of bot-making. You can write a new bot in just a few of lines of code! 
 
 Skellington has a robust plugin architecture letting you import plugins into your Skellington bot to mix and
 match functionality. This will let you keep your bot small, code clean, and your deployments simple.
@@ -60,46 +60,57 @@ An array of plugins. See [below](#plugin-api) for details.
 ### slackToken
 
 **Required for Single Team Bot**
+
 If this is a single team bot, the Slack API token used to connect to the Slack API.
 
 ### port
 
-**Required for a Slack App**
+**Required for a Slack App, Optional for a Single Team Bot**
+
 If passed, will create an express server listening on the port. The express app will be passed to plugins in the `init` and `botConnected` callbacks.
 
 ### clientId
 
 **Required for a Slack App**
+
 Your Slack OAuth client ID.
 
 ### clientSecret
 
 **Required for a Slack App**
+
 Your Slack OAuth client secret.
 
 ### redirectUri
 
 **Optional for a Slack App**
+
 A redirect URI to pass to Slack during the OAuth flow.
 
 ### state
 
 **Optional for a Slack App**
-State that will be returned in the POST during the redirect from Slack as part of the OAuth flow.
+
+State that will be returned from Slack as part of the OAuth flow. This is usually used
+to verify the callback from the Identity Provider (Slack, in this case) is legitimate.
 
 ### scopes
 
 **Optional for a Slack App**
-The scopes your app will be requesting. Defaults to no scopes. Scopes can be passed from plugins as well.
+
+The [OAuth scopes](https://api.slack.com/docs/oauth-scopes) your app will be requesting. Defaults to no scopes. Scopes can be passed from plugins as well.
 
 ## Plugin API
 
-Learn more about the Botkit API in [the howdyai/botkit docs](https://github.com/howdyai/botkit/blob/master/readme.md).
-
 ### init
 
-Each plugin passed to Skellington should export an object with an `init` function that will take a botkit `controller`, `bot`,
-and optionally an Express `app` (this will only exist if `config.port` was set): 
+Each plugin passed to Skellington can export an object with an `init` function that will take a botkit `controller`, `bot`,
+and optionally an Express `app` (this will only exist if `config.port` was set). This callback will be called once when Skellington is started.
+This is when most plugins will set up their listeners for Slack and Botkit events. Learn more about the Botkit API in [the howdyai/botkit docs](https://github.com/howdyai/botkit/blob/master/readme.md).
+
+NOTE: the *bot* parameter will be `null` for Slack Apps, since `init` is called only once before any teams have connected.
+If you want access to the team bot, you can write a `botConnected` callback that will be called whenever a new team initiates
+an RTM session with Slack.
 
 
 ```js
@@ -113,9 +124,6 @@ module.exports = {
 };
 ```
 
-NOTE: the *bot* parameter will be `null` for Slack Apps, since `init` is called only once before any teams have connected.
-If you want access to the team bot, you can write a `botConnected` callback that will be called whenever a new team initiates
-an RTM session with Slack.
 
 ### botConnected
 The `botConnected` callback is called any time a bot connects to an RTM session with Slack. It is called for both Slack Apps
