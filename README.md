@@ -201,5 +201,5 @@ controller.storage.teams.get('teamId', function(err, team) {
 
 ### Namespace Express Paths
 
-If you are writing slash commands and need access to the express server, use a namespaced path,
+If you are adding additional routes to the express app use a namespaced path,
 like `/funny-gifs/endpoint`. Don't add things to the root path, those are likely to conflict with another bot.
