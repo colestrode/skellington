@@ -149,6 +149,15 @@ module.exports = {
 ### scopes
 For plugins that are specifically for Slack apps, you can pass an array of OAuth [scopes](https://api.slack.com/docs/oauth-scopes) your plugin will require.
 
+```js
+module.exports = {
+  init: function(controller, bot, expressApp) {
+    // what an awesome multi-team bot!  
+  },
+  scopes: ['bot']
+};
+```
+
 ### Adding Help Text
 
 You can optionally include help text for your plugin. To do this, you will need a a `help` object with `command` and `text`
