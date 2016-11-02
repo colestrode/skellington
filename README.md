@@ -51,7 +51,9 @@ Skellington will allow you to create a single team bot for that team or
 a Slack app capable of multi-team bots, slash commands, and incoming webhooks. 
 These types are mutually exclusive and which type you create depends on the options you pass.
 
-Skellington will accept any option to configure a Botkit Slack bot.
+### botkit
+
+An object of options passed directly to `Botkit.slackbot`.
 
 ### plugins
 

@@ -5,7 +5,7 @@ const _ = require('lodash')
 const connectedBots = new Set()
 
 module.exports = (config) => {
-  let controller = Botkit.slackbot(getSlackbotConfig(config))
+  let controller = Botkit.slackbot(config.botkit)
 
   validateConfig(config, controller)
   addHelpListeners(controller, config.plugins)
@@ -63,17 +63,6 @@ function validateConfig (config, controller) {
     logError(controller, new Error('Missing configuration. Config must include either slackToken AND/OR clientId, clientSecret, and port'))
     process.exit(1)
   }
-}
-
-/**
- * Given the passed config, returns an object with values relevant to configuring a Botkit slack bot
- *
- * @param config
- * @returns {{}}
- */
-function getSlackbotConfig (config) {
-  // omit config values not needed to configure a slackbot
-  return _.omit(config, ['clientId', 'clientSecret', 'plugins', 'port', 'redirectUri', 'scopes', 'slackToken', 'state'])
 }
 
 /**

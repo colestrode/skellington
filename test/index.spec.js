@@ -74,7 +74,9 @@ describe('Skellington', function () {
 
     beforeEach(function () {
       testConfig = {
-        thisone: 'iscool',
+        botkit: {
+          thisone: 'iscool'
+        },
         clientId: 'nope',
         clientSecret: 'nope',
         plugins: ['nope'],
@@ -86,10 +88,9 @@ describe('Skellington', function () {
       }
     })
 
-    it('should strip skellington specific configs for slackbot initialization', function () {
+    it('should pass botkit config to botkit', function () {
       skellington(testConfig)
-      expect(botkitMock.slackbot).to.have.been.called
-      expect(botkitMock.slackbot.args[0][0]).to.have.keys(['thisone'])
+      expect(botkitMock.slackbot).to.have.been.calledWith(testConfig.botkit)
     })
 
     it('should take a non-array plugins and wrap it as an array', function () {
