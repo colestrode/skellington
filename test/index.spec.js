@@ -93,6 +93,12 @@ describe('Skellington', function () {
       expect(botkitMock.slackbot).to.have.been.calledWith(testConfig.botkit)
     })
 
+    it('should pass empty config to botkit if no botkit config is passed', function () {
+      delete testConfig.botkit
+      skellington(testConfig)
+      expect(botkitMock.slackbot).to.have.been.calledWith({})
+    })
+
     it('should take a non-array plugins and wrap it as an array', function () {
       testConfig.plugins = 'plugin'
       skellington(testConfig)

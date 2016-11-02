@@ -5,7 +5,7 @@ const _ = require('lodash')
 const connectedBots = new Set()
 
 module.exports = (config) => {
-  let controller = Botkit.slackbot(config.botkit)
+  let controller = Botkit.slackbot(config.botkit || {})
 
   validateConfig(config, controller)
   addHelpListeners(controller, config.plugins)

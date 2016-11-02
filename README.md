@@ -53,7 +53,7 @@ These types are mutually exclusive and which type you create depends on the opti
 
 ### botkit
 
-An object of options passed directly to `Botkit.slackbot`.
+An optional object of options passed directly to `Botkit.slackbot`.
 
 ### plugins
 
