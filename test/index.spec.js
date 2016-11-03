@@ -88,15 +88,24 @@ describe('Skellington', function () {
       }
     })
 
-    it('should pass botkit config to botkit', function () {
+    it('should pass botkit config to botkit with defaults', function () {
+      const expectedConfg = _.clone(testConfig.botkit)
+      expectedConfg.debug = false
+      expectedConfg.status_optout = true
+
       skellington(testConfig)
-      expect(botkitMock.slackbot).to.have.been.calledWith(testConfig.botkit)
+      expect(botkitMock.slackbot).to.have.been.calledWith(expectedConfg)
     })
 
-    it('should pass empty config to botkit if no botkit config is passed', function () {
+    it('should pass defaults to botkit if no botkit config is passed', function () {
+      const expectedConfg = {
+        debug: false,
+        status_optout: true
+      }
+
       delete testConfig.botkit
       skellington(testConfig)
-      expect(botkitMock.slackbot).to.have.been.calledWith({})
+      expect(botkitMock.slackbot).to.have.been.calledWith(expectedConfg)
     })
 
     it('should take a non-array plugins and wrap it as an array', function () {

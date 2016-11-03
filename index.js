@@ -3,9 +3,13 @@
 const Botkit = require('botkit')
 const _ = require('lodash')
 const connectedBots = new Set()
+const botkitDefaults = {
+  debug: false,
+  status_optout: true
+}
 
 module.exports = (config) => {
-  let controller = Botkit.slackbot(config.botkit || {})
+  let controller = Botkit.slackbot(_.defaults(config.botkit, botkitDefaults))
 
   validateConfig(config, controller)
   addHelpListeners(controller, config.plugins)
@@ -46,7 +50,7 @@ module.exports = (config) => {
  * @param controller
  */
 function validateConfig (config, controller) {
-  _.defaults(config, {debug: false, plugins: [], status_optout: true})
+  _.defaults(config, {debug: false, plugins: []})
 
   if (!Array.isArray(config.plugins)) {
     config.plugins = [config.plugins]
