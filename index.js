@@ -3,9 +3,13 @@
 const Botkit = require('botkit')
 const _ = require('lodash')
 const connectedBots = new Set()
+const botkitDefaults = {
+  debug: false,
+  status_optout: true
+}
 
 module.exports = (config) => {
-  let controller = Botkit.slackbot(getSlackbotConfig(config))
+  let controller = Botkit.slackbot(_.defaults(config.botkit, botkitDefaults))
 
   validateConfig(config, controller)
   addHelpListeners(controller, config.plugins)
@@ -46,7 +50,7 @@ module.exports = (config) => {
  * @param controller
  */
 function validateConfig (config, controller) {
-  _.defaults(config, {debug: false, plugins: [], status_optout: true})
+  _.defaults(config, {debug: false, plugins: []})
 
   if (!Array.isArray(config.plugins)) {
     config.plugins = [config.plugins]
@@ -63,17 +67,6 @@ function validateConfig (config, controller) {
     logError(controller, new Error('Missing configuration. Config must include either slackToken AND/OR clientId, clientSecret, and port'))
     process.exit(1)
   }
-}
-
-/**
- * Given the passed config, returns an object with values relevant to configuring a Botkit slack bot
- *
- * @param config
- * @returns {{}}
- */
-function getSlackbotConfig (config) {
-  // omit config values not needed to configure a slackbot
-  return _.omit(config, ['clientId', 'clientSecret', 'plugins', 'port', 'redirectUri', 'scopes', 'slackToken', 'state'])
 }
 
 /**
