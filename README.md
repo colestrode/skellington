@@ -102,6 +102,18 @@ to verify the callback from the Identity Provider (Slack, in this case) is legit
 
 The [OAuth scopes](https://api.slack.com/docs/oauth-scopes) your app will be requesting. Defaults to no scopes. Scopes can be passed from plugins as well.
 
+### debug
+
+Whether to turn on debug mode. By default this value will be used for the `botkit.debug` option, but this can be overridden
+in the botkit config.
+
+### debugOptions
+
+Used if `debug` is true. 
+
+`debugOptions.formatter` A formatter function that will be used to log any message to a `hears` call. Will be passed
+the `message` object. Additional debug information will be added onto the message on the `skellington` key.
+
 ## Plugin API
 
 ### init

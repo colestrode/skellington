@@ -4,7 +4,7 @@
   "description": "A plugable bot system for botkit",
   "main": "index.js",
   "scripts": {
-    "pretest": "standard index.js test/**/*.spec.js --fix",
+    "pretest": "standard index.js lib/**/*.js test/**/*.spec.js --fix",
     "test": "istanbul cover --report lcov --dir ./coverage/ _mocha --recursive ./test --grep ./test/**/*.spec.js -- --colors --reporter spec",
     "ci": "npm test && cat ./coverage/lcov.info | coveralls"
   },

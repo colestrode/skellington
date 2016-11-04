@@ -15,6 +15,7 @@ describe('Skellington', function () {
   let botMock
   let storageMock
   let err
+  let debugLoggerMock
 
   function getOnCallback (eventName) {
     return _.find(controllerMock.on.args, (args) => {
@@ -58,8 +59,11 @@ describe('Skellington', function () {
 
     err = new Error('DING!')
 
+    debugLoggerMock = sinon.stub()
+
     skellington = proxyquire('../index', {
-      'botkit': botkitMock
+      'botkit': botkitMock,
+      './lib/debug-logger': debugLoggerMock
     })
   })
 
@@ -133,6 +137,55 @@ describe('Skellington', function () {
       process.exit.reset()
       skellington({clientId: 'close', clientSecret: 'closer'})
       expect(process.exit).to.have.been.calledWith(1)
+    })
+  })
+
+  describe('debug', function () {
+    let testConfig
+
+    beforeEach(function () {
+      testConfig = {
+        debug: false,
+        slackToken: 'abc123'
+      }
+    })
+
+    it('should not set up debug logger if debug is false', function () {
+      skellington(testConfig)
+      const botkitDebug = botkitMock.slackbot.args[0][0].debug
+
+      expect(debugLoggerMock).not.to.have.been.calledWith(controllerMock, {})
+      expect(botkitDebug).to.be.false
+    })
+
+    it('should pass debug options', function() {
+      testConfig.debugOptions = {walter: 'white'}
+      skellington(testConfig)
+      const botkitDebug = botkitMock.slackbot.args[0][0].debug
+
+      expect(debugLoggerMock).not.to.have.been.calledWith(controllerMock, testConfig.debugOptions)
+      expect(botkitDebug).to.be.false
+    });
+
+    it('should set up debug logger and botkit logging if debug is true', function () {
+      testConfig.debug = true
+
+      skellington(testConfig)
+      const botkitDebug = botkitMock.slackbot.args[0][0].debug
+
+      expect(debugLoggerMock).to.have.been.called
+      expect(botkitDebug).to.be.true
+    })
+
+    it('should set up botkit debug false if botkit config.debug is false and debug is true', function () {
+      testConfig.debug = true
+      testConfig.botkit = {debug: false}
+
+      skellington(testConfig)
+      const botkitDebug = botkitMock.slackbot.args[0][0].debug
+
+      expect(debugLoggerMock).to.have.been.called
+      expect(botkitDebug).to.be.false
     })
   })
 

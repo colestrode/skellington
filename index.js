@@ -2,6 +2,7 @@
 
 const Botkit = require('botkit')
 const _ = require('lodash')
+const debugLogger = require('./lib/debug-logger')
 const connectedBots = new Set()
 const botkitDefaults = {
   debug: false,
@@ -9,9 +10,15 @@ const botkitDefaults = {
 }
 
 module.exports = (config) => {
-  let controller = Botkit.slackbot(_.defaults(config.botkit, botkitDefaults))
+  let controller = Botkit.slackbot(getSlackbotConfig(config))
 
-  validateConfig(config, controller)
+  formatConfig(config, controller)
+
+  if (config.debug) {
+    // start debugging before help listeners are added
+    debugLogger(controller, config.debugOptions)
+  }
+
   addHelpListeners(controller, config.plugins)
 
   if (config.port) {
@@ -44,13 +51,23 @@ module.exports = (config) => {
 }
 
 /**
- * Validates that required params are passed, will exit the process with an error if required config is missing
+ * Gets the config object for Botkit.slackbot
+ * @param config
+ */
+function getSlackbotConfig (config) {
+  return _.defaults(config.botkit, {debug: !!config.debug}, botkitDefaults)
+}
+
+/**
+ * Formats config values so they are normalized, will exit the process with an error if required config is missing
  *
  * @param config
  * @param controller
  */
-function validateConfig (config, controller) {
+function formatConfig (config, controller) {
   _.defaults(config, {debug: false, plugins: []})
+
+  config.debugOptions = config.debugOptions || {}
 
   if (!Array.isArray(config.plugins)) {
     config.plugins = [config.plugins]
