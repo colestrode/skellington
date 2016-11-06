@@ -102,6 +102,12 @@ to verify the callback from the Identity Provider (Slack, in this case) is legit
 
 The [OAuth scopes](https://api.slack.com/docs/oauth-scopes) your app will be requesting. Defaults to no scopes. Scopes can be passed from plugins as well.
 
+### exitOnRtmFailure
+
+**Optional for Single Team Bot**
+
+Whether to exit the process if an RTM connection cannot be established. Defaults to `true`;
+
 ### debug
 
 Whether to turn on debug mode. By default this value will be used for the `botkit.debug` option, but this can be overridden
