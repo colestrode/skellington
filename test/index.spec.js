@@ -29,12 +29,16 @@ describe('Skellington', function () {
       reply: sinon.stub(),
       identity: {
         name: 'gazorpazorp'
+      },
+      team_info: {
+        id: 'richsanchez'
       }
     }
 
     storageMock = {
       teams: {
-        all: sinon.stub().yields(null)
+        all: sinon.stub().yields(null),
+        save: sinon.stub().yields(null)
       }
     }
 
@@ -94,8 +98,8 @@ describe('Skellington', function () {
 
     it('should pass botkit config to botkit with defaults', function () {
       const expectedConfg = _.clone(testConfig.botkit)
-      expectedConfg.debug = false
       expectedConfg.status_optout = true
+      expectedConfg.debug = false
 
       skellington(testConfig)
       expect(botkitMock.slackbot).to.have.been.calledWith(expectedConfg)
@@ -108,22 +112,25 @@ describe('Skellington', function () {
       }
 
       delete testConfig.botkit
+
       skellington(testConfig)
       expect(botkitMock.slackbot).to.have.been.calledWith(expectedConfg)
     })
 
     it('should take a non-array plugins and wrap it as an array', function () {
       testConfig.plugins = 'plugin'
+      testConfig.debug = true
       skellington(testConfig)
-      expect(testConfig.plugins).to.be.an('array')
+      expect(skellington.__config.plugins).to.be.an('array')
     })
 
     it('should flatten scopes', function () {
       testConfig.scopes = ['a']
       testConfig.plugins = [{scopes: ['b', 'c'], init: noop}, {scopes: ['c', 'd'], init: noop}]
+      testConfig.debug = true
       skellington(testConfig)
 
-      expect(testConfig.scopes.sort()).to.deep.equal(['a', 'b', 'c', 'd'])
+      expect(skellington.__config.scopes.sort()).to.deep.equal(['a', 'b', 'c', 'd'])
     })
 
     it('should exit if required configs are missing', function () {
@@ -363,6 +370,8 @@ describe('Skellington', function () {
     })
 
     it('should configure a slack app and initialize plugins', function () {
+      botMock.startRTM.yields(null, botMock)
+
       skellington(testConfig)
       expect(controllerMock.configureSlackApp).to.have.been.calledWith({
         clientId: testConfig.clientId,
@@ -405,15 +414,37 @@ describe('Skellington', function () {
       expect(plugin.botConnected).not.to.have.been.called
     })
 
-    it('should exit if cannot connect team to rtm', function () {
-      botMock.startRTM.yields(err)
+    it('should remove team for account_inactive error', function () {
+      botMock.startRTM.yields('account_inactive')
       skellington(testConfig)
 
       expect(storageMock.teams.all).to.have.been.called
       expect(controllerMock.spawn).to.have.been.calledTwice
       expect(botMock.startRTM).to.have.been.called
+      expect(storageMock.teams.save).to.have.been.called
       expect(plugin.botConnected).not.to.have.been.called
-      expect(process.exit).to.have.been.calledWith(1)
+    })
+
+    it('should remove team for invalid_auth error', function () {
+      botMock.startRTM.yields('invalid_auth')
+      skellington(testConfig)
+
+      expect(storageMock.teams.all).to.have.been.called
+      expect(controllerMock.spawn).to.have.been.calledTwice
+      expect(botMock.startRTM).to.have.been.called
+      expect(storageMock.teams.save).to.have.been.called
+      expect(plugin.botConnected).not.to.have.been.called
+    })
+
+    it('should not remove team for other errors', function () {
+      botMock.startRTM.yields('two dots')
+      skellington(testConfig)
+
+      expect(storageMock.teams.all).to.have.been.called
+      expect(controllerMock.spawn).to.have.been.calledTwice
+      expect(botMock.startRTM).to.have.been.called
+      expect(storageMock.teams.save).not.to.have.been.called
+      expect(plugin.botConnected).not.to.have.been.called
     })
   })
 
@@ -479,6 +510,18 @@ describe('Skellington', function () {
       expect(plugin.init).not.to.have.been.called
       expect(plugin.botConnected).not.to.have.been.called
     })
+
+    it('should not exit if starting rtm fails and exitOnRtmFailure is false', function () {
+      botMock.startRTM.yields(err)
+      testConfig.exitOnRtmFailure = false
+      skellington(testConfig)
+
+      expect(controllerMock.spawn).to.have.been.calledWith({token: 'abc123'})
+      expect(botMock.startRTM).to.have.been.called
+      expect(process.exit).not.to.have.been.called
+      expect(plugin.init).not.to.have.been.called
+      expect(plugin.botConnected).not.to.have.been.called
+    })
   })
 
   describe('event: create_bot', function () {
@@ -498,7 +541,17 @@ describe('Skellington', function () {
       }
 
       newBot = {
-        startRTM: sinon.stub()
+        startRTM: sinon.stub().yields(null, newBot),
+        identity: {
+          name: 'rick',
+          id: 'rick'
+        },
+        config: {
+          id: 'ricksanchez'
+        },
+        team_info: {
+          id: 'ricksanchez'
+        }
       }
 
       newBot.startRTM.yields(null, newBot)
@@ -526,32 +579,35 @@ describe('Skellington', function () {
       callback(newBot)
       expect(newBot.startRTM).to.have.been.called
       expect(plugin.botConnected).not.to.have.been.called
-      expect(process.exit).to.have.been.called
     })
   })
 
   describe('event: rtm_close', function () {
     let callback
 
-    beforeEach(function () {
-      skellington({})
+    function getRTMCallback(config) {
+
+      skellington(config)
 
       controllerMock.log.reset()
+      process.exit.reset()
 
       botMock.startRTM.reset()
       botMock.startRTM.yields(null)
 
-      callback = getOnCallback('rtm_close')
-    })
+      return getOnCallback('rtm_close')
+    }
 
     it('should reconnect', function () {
+      callback = getRTMCallback({slackToken: 'abc'})
+
       callback(botMock)
-      expect(controllerMock.log).to.be.calledOnce
       expect(botMock.startRTM).to.be.calledOnce
     })
 
-    it('should exit if reconnect fails', function () {
+    it('should exit if reconnect fails for single bot', function () {
       let error = new Error('GAZORPAZORP')
+      callback = getRTMCallback({slackToken: 'abc'})
 
       botMock.startRTM.yields(error)
 
@@ -559,5 +615,29 @@ describe('Skellington', function () {
       expect(botMock.startRTM).to.be.calledOnce
       expect(process.exit).to.be.calledWith(1)
     })
+
+    it('should not exit if reconnect fails for single bot and exitOnRtmFailure is false', function() {
+      let error = new Error('GAZORPAZORP')
+
+      callback = getRTMCallback({slackToken: 'abc', exitOnRtmFailure: false})
+
+      botMock.startRTM.yields(error)
+
+      callback(botMock)
+      expect(botMock.startRTM).to.be.calledOnce
+      expect(process.exit).not.to.be.called
+    });
+
+    it('should not exit if reconnect fails for a slack app', function() {
+      let error = new Error('GAZORPAZORP')
+
+      callback = getRTMCallback({clientId: 'walter', clientSecret: 'heisenberg'})
+
+      botMock.startRTM.yields(error)
+
+      callback(botMock)
+      expect(botMock.startRTM).to.be.calledOnce
+      expect(process.exit).not.to.be.called
+    });
   })
 })

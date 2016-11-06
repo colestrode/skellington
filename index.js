@@ -3,19 +3,21 @@
 const Botkit = require('botkit')
 const _ = require('lodash')
 const debugLogger = require('./lib/debug-logger')
-const connectedBots = new Set()
+const connectedTeams = new Set()
 const botkitDefaults = {
   debug: false,
   status_optout: true
 }
 
-module.exports = (config) => {
-  let controller = Botkit.slackbot(getSlackbotConfig(config))
+module.exports = (cfg) => {
+  const config = _.cloneDeep(cfg)
+  const controller = Botkit.slackbot(getSlackbotConfig(config))
 
   formatConfig(config, controller)
 
+  // start debugging before help listeners are added
   if (config.debug) {
-    // start debugging before help listeners are added
+    module.exports.__config = config // expose internal config during debug mode
     debugLogger(controller, config.debugOptions)
   }
 
@@ -25,29 +27,53 @@ module.exports = (config) => {
     startServer(controller, config.port)
   }
 
-  if (config.clientId && config.clientSecret) {
+  if (config.isSlackApp) {
     startSlackApp(config, controller)
-  } else if (config.slackToken) {
+  } else {
     startSingleBot(config, controller)
   }
 
   // used for slack apps that will connect multiple bots
   controller.on('create_bot', (bot) => {
+    const teamId = bot.config.id
+
     // keep track of bots
-    if (!connectedBots.has(bot)) {
-      startRtm(controller, bot, () => {
-        connectedBots.add(bot)
-        botConnected(config.plugins, controller, bot)
-        controller.log('bot added!')
+    if (!connectedTeams.has(teamId)) {
+      bot.startRTM((err, connectedBot) => {
+        if (err) {
+          return logError(controller, err, 'Could not connect bot to RTM')
+        }
+
+        connectedTeams.add(connectedBot.team_info.id)
+
+        botConnected(config.plugins, controller, connectedBot)
+        controller.log(`added bot ${identity(connectedBot)}`)
       })
     }
   })
 
   // restart if disconnected
   controller.on('rtm_close', (bot) => {
-    controller.log('rtm closed, attempting to reconnect')
-    startRtm(controller, bot)
+    controller.log(`rtm closed, attempting to reconnect bot ${identity(bot)}`)
+
+    bot.startRTM((err) => {
+      if (!err) {
+        return controller.log(`reconnected bot ${identity(bot)}`)
+      }
+
+      logError(controller, err, `Could not re-connect bot to RTM ${identity(bot)}`)
+
+      if (config.isSlackApp) {
+        connectedTeams.delete(bot.team_info.id)
+      } else if (config.exitOnRtmFailure !== false) {
+        process.exit(1)
+      }
+    })
   })
+}
+
+function identity (bot) {
+  return JSON.stringify({name: bot.identity.name, id: bot.identity.id})
 }
 
 /**
@@ -78,7 +104,10 @@ function formatConfig (config, controller) {
     .flatten()
     .concat(_.isArray(config.scopes) ? config.scopes : [])
     .uniq()
+    .remove(_.isString.bind(_))
     .value()
+
+  config.isSlackApp = !config.slackToken
 
   if (!config.slackToken && !(config.clientId && config.clientSecret && config.port)) {
     logError(controller, new Error('Missing configuration. Config must include either slackToken AND/OR clientId, clientSecret, and port'))
@@ -97,8 +126,16 @@ function startSingleBot (config, controller) {
     token: config.slackToken
   })
 
-  startRtm(controller, bot, (connectedBot) => {
-    connectedBots.add(connectedBot)
+  bot.startRTM((err, connectedBot) => {
+    if (err) {
+      logError(controller, err, 'Could not connect bot to RTM') // what information could we log??
+      if (config.exitOnRtmFailure !== false) {
+        return process.exit(1)
+      }
+      return
+    }
+
+    connectedTeams.add(bot.team_info.id)
     initializePlugins(config.plugins, controller, connectedBot)
     botConnected(config.plugins, controller, connectedBot)
   })
@@ -130,11 +167,20 @@ function startSlackApp (config, controller) {
     _.forEach(teams, (team) => {
       if (!team.bot) return
 
-      let bot = controller.spawn(team)
-      startRtm(controller, bot, () => {
-        connectedBots.add(bot)
-        botConnected(config.plugins, controller, bot)
-        controller.log('bot added from storage')
+      controller.spawn(team).startRTM((err, connectedBot) => {
+        if (!err) {
+          connectedTeams.add(team.id)
+          botConnected(config.plugins, controller, connectedBot)
+          controller.log('bot added from storage', connectedBot.identity.id)
+          return
+        }
+
+        logError(controller, err, `Could not reconnect bot to team ${team.id}`)
+        if (err === 'account_inactive' || err === 'invalid_auth') {
+          controller.log(`authentication revoked for for ${team.id}`)
+          delete team.bot
+          controller.storage.teams.save(team, function () {}) // fail silently
+        }
       })
     })
   })
@@ -211,26 +257,6 @@ function registerHelpListener (controller, helpInfo) {
     }
 
     bot.reply(message, replyText)
-  })
-}
-
-/**
- * Starts an RTM connection for a bot
- *
- * @param controller
- * @param bot
- * @param cb
- */
-function startRtm (controller, bot, cb) {
-  cb = cb || function () {}
-
-  bot.startRTM((err, connectedBot) => {
-    if (err) {
-      logError(controller, err, 'Error connecting to RTM')
-      return process.exit(1) // need the return for tests which mock our process.exit
-    }
-
-    cb(connectedBot)
   })
 }
 
