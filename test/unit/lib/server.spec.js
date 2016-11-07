@@ -30,7 +30,7 @@ describe('server', function () {
 
     err = new Error('GUSFRING')
 
-    server = proxyquire('../../lib/server', {
+    server = proxyquire('../../../lib/server', {
       './utils': utilsMock
     })
   })
