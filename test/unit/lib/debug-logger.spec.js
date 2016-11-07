@@ -31,7 +31,7 @@ describe('Debug Logger', function () {
 
     events = ['white']
 
-    logger = require('../../lib/debug-logger')
+    logger = require('../../../lib/debug-logger')
   })
 
   function getLoggingMiddleware () {

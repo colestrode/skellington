@@ -24,7 +24,7 @@ describe('plugin-lifecycle', function () {
       logError: sinon.stub()
     }
 
-    lifecycle = proxyquire('../../lib/plugin-lifecycle', {
+    lifecycle = proxyquire('../../../lib/plugin-lifecycle', {
       './utils': utilsMock
     })
   })

@@ -80,7 +80,7 @@ describe('slack-app', function () {
 
     err = new Error('GUSFRING')
 
-    slackApp = proxyquire('../../lib/slack-app', {
+    slackApp = proxyquire('../../../lib/slack-app', {
       './plugin-lifecycle': lifecycleMock,
       './utils': utilsMock
     })

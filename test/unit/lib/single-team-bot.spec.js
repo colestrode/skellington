@@ -52,7 +52,7 @@ describe('single-team-bot', function () {
 
     err = new Error('GUSFRING')
 
-    singleTeamBot = proxyquire('../../lib/single-team-bot', {
+    singleTeamBot = proxyquire('../../../lib/single-team-bot', {
       './plugin-lifecycle': lifecycleMock,
       './utils': utilsMock
     })

@@ -12,7 +12,6 @@ describe('Skellington', function () {
   let skellington
   let botkitMock
   let controllerMock
-  let err
   let debugLoggerMock
   let serverMock
   let helpMock
@@ -28,8 +27,6 @@ describe('Skellington', function () {
     }
 
     sinon.stub(process, 'exit')
-
-    err = new Error('DING!')
 
     debugLoggerMock = {
       addLogger: sinon.stub()
@@ -55,7 +52,7 @@ describe('Skellington', function () {
       start: sinon.stub()
     }
 
-    skellington = proxyquire('../index', {
+    skellington = proxyquire('../../index', {
       'botkit': botkitMock,
       './lib/debug-logger': debugLoggerMock,
       './lib/server': serverMock,
@@ -128,12 +125,12 @@ describe('Skellington', function () {
       expect(instance.__config.scopes.sort()).to.deep.equal(['a', 'b', 'c', 'd'])
     })
 
-    it('should add a set of connectedTeams', function() {
+    it('should add a set of connectedTeams', function () {
       testConfig.debug = true
       const instance = skellington(testConfig)
 
       expect(instance.__config.connectedTeams).to.be.instanceOf(Set)
-    });
+    })
 
     it('should exit if required configs are missing', function () {
       skellington({})
@@ -149,10 +146,10 @@ describe('Skellington', function () {
     })
   })
 
-  describe('init', function() {
+  describe('init', function () {
     let testConfig
 
-    beforeEach(function() {
+    beforeEach(function () {
       testConfig = {
         debug: true,
         botkit: {
@@ -164,29 +161,29 @@ describe('Skellington', function () {
       }
     })
 
-    it('should add help listeners', function() {
+    it('should add help listeners', function () {
       skellington(testConfig)
       expect(helpMock.addHelpListeners).to.have.been.calledWith(controllerMock, testConfig.plugins)
     })
 
-    it('should set up a webserver if port is passed', function() {
+    it('should set up a webserver if port is passed', function () {
       const instance = skellington(testConfig)
       expect(serverMock.start).to.have.been.calledWith(controllerMock, instance.__config)
     })
 
-    it('should not set up a webserver if port is not pased', function() {
+    it('should not set up a webserver if port is not pased', function () {
       delete testConfig.port
       skellington(testConfig)
       expect(serverMock.start).not.to.have.been.called
     })
 
-    it('should set up a single team bot if slack token is passed', function() {
+    it('should set up a single team bot if slack token is passed', function () {
       const instance = skellington(testConfig)
       expect(singleBotMock.start).to.have.been.calledWith(controllerMock, instance.__config)
       expect(slackAppMock.start).not.to.have.been.called
     })
 
-    it('should set up a slack app if slackToken is missing', function() {
+    it('should set up a slack app if slackToken is missing', function () {
       testConfig.clientId = 'the one who knocks'
       testConfig.clientSecret = 'shhhh'
       delete testConfig.slackToken
@@ -207,12 +204,12 @@ describe('Skellington', function () {
       }
     })
 
-    it('should not expose config if debug is false', function() {
+    it('should not expose config if debug is false', function () {
       const instance = skellington(testConfig)
       expect(instance.__config).not.to.exist
     })
 
-    it('should expose config if debug is true', function() {
+    it('should expose config if debug is true', function () {
       testConfig.debug = true
       const instance = skellington(testConfig)
       expect(instance.__config).to.exist
@@ -226,7 +223,7 @@ describe('Skellington', function () {
       expect(botkitDebug).to.be.false
     })
 
-    it('should pass debug options', function() {
+    it('should pass debug options', function () {
       testConfig.debugOptions = {walter: 'white'}
       skellington(testConfig)
       const botkitDebug = botkitMock.slackbot.args[0][0].debug

@@ -36,7 +36,7 @@ describe('help', function () {
       user: 'persuasion'
     }
 
-    help = require('../../lib/help')
+    help = require('../../../lib/help')
   })
 
   it('should register a listener if no plugins have help text', function () {
