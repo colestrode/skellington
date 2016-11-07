@@ -128,6 +128,13 @@ describe('Skellington', function () {
       expect(instance.__config.scopes.sort()).to.deep.equal(['a', 'b', 'c', 'd'])
     })
 
+    it('should add a set of connectedTeams', function() {
+      testConfig.debug = true
+      const instance = skellington(testConfig)
+
+      expect(instance.__config.connectedTeams).to.be.instanceOf(Set)
+    });
+
     it('should exit if required configs are missing', function () {
       skellington({})
       expect(process.exit).to.have.been.calledWith(1)
