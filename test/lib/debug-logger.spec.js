@@ -40,7 +40,7 @@ describe('Debug Logger', function () {
   }
 
   it('should log on a call to hears', function () {
-    logger(controllerMock, testConfig)
+    logger.addLogger(controllerMock, testConfig)
     const loggingMiddleware = getLoggingMiddleware()
 
     expect(hearsMock).to.have.been.called
@@ -50,7 +50,7 @@ describe('Debug Logger', function () {
   })
 
   it('should not log if default hears_test returns false', function () {
-    logger(controllerMock, testConfig)
+    logger.addLogger(controllerMock, testConfig)
     controllerMock.hears_test.returns(false)
     const loggingMiddleware = getLoggingMiddleware()
 
@@ -59,7 +59,7 @@ describe('Debug Logger', function () {
   })
 
   it('should log if middleware returns true', function () {
-    logger(controllerMock, testConfig)
+    logger.addLogger(controllerMock, testConfig)
 
     const middleware = sinon.stub().returns(true)
     controllerMock.hears(patterns, events, middleware, () => {})
@@ -72,7 +72,7 @@ describe('Debug Logger', function () {
   })
 
   it('should not log if middleware returns false', function () {
-    logger(controllerMock, testConfig)
+    logger.addLogger(controllerMock, testConfig)
 
     const middleware = sinon.stub().returns(false)
     controllerMock.hears(patterns, events, middleware, () => {})
@@ -85,7 +85,7 @@ describe('Debug Logger', function () {
 
   it('should allow formatter to be overwritten', function () {
     testConfig.formatter = sinon.stub()
-    logger(controllerMock, testConfig)
+    logger.addLogger(controllerMock, testConfig)
 
     const loggingMiddleware = getLoggingMiddleware()
     loggingMiddleware(patterns, messageMock)
@@ -100,7 +100,7 @@ describe('Debug Logger', function () {
     it('should restore prepareStackTrace', function () {
       // prepareStackTrace gets temporarily overwritten, make sure we restore it
       const prepareStackTraceOrig = Error.prepareStackTrace
-      logger(controllerMock, testConfig)
+      logger.addLogger(controllerMock, testConfig)
       expect(Error.prepareStackTrace).to.equal(prepareStackTraceOrig)
     })
   })
