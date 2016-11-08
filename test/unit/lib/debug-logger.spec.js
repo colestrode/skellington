@@ -93,7 +93,7 @@ describe('Debug Logger', function () {
     expect(testConfig.formatter).to.have.been.called
     const firstArg = testConfig.formatter.args[0][0]
     expect(firstArg).to.include.keys(['skellington'])
-    expect(firstArg.skellington).to.include.keys(['file'])
+    expect(firstArg.skellington).to.include.keys(['file', 'config'])
   })
 
   describe('getCallerFile', function () {
