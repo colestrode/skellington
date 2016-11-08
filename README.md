@@ -2,19 +2,20 @@
 
 [![Build Status](https://travis-ci.org/colestrode/skellington.svg?branch=master)](https://travis-ci.org/colestrode/skellington)
 [![Coverage Status](https://coveralls.io/repos/github/colestrode/skellington/badge.svg?branch=master)](https://coveralls.io/github/colestrode/skellington?branch=master)
+[![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
 The skeleton for your Slack bots.
 
-## Composable Slack Bots
+# Composable Slack Bots
 
-Skellington is a skeleton for your [Botkit](https://github.com/howdyai/botkit) bots. It handles the boilerplate connection
+Skellington is a skeleton for your [Botkit](https://github.com/howdyai/botkit) Slack bots. It handles the boilerplate connection
 and error handling and let's you get down to the business of bot-making. You can write a new bot in just a few of lines of code! 
 
 Skellington has a robust plugin architecture letting you import plugins into your Skellington bot to mix and
 match functionality. This will let you keep your bot small, code clean, and your deployments simple.
 
 
-## Usage
+# Usage
 
 This is all the code you need to write to make a Skellington bot for a single team:
 
@@ -25,123 +26,87 @@ require('skellington')({
 });
 ```
 
-### Creating a Slack App
+## Creating a Slack App
 
-Skellington will also set up a Slack app for incoming webhooks, slash commands, and multiteam support. Just pass a few configs:
+You can also use Skellington to set up a Slack app for incoming webhooks, slash commands, and multiteam support. Just pass a few configs:
 
 ```js
 require('skellington')({
   clientId: 'jack',
   clientSecret: 'shhhhhh',
   port: 433,
-  scopes: ['bot'], // scopes can come from the config or from plugins
-  state: {}, // optional state passed back during the OAuth authentication flow
+  scopes: ['bot'], // optional, scopes can come from the config or from plugins
+  state: 'kentucky', // optional state passed back during the OAuth authentication flow
   redirectUri: 'http://skellington.is.cool', // optional redirect URI configured in Slack for your app
   plugins: [require('gobot'), require('awesom-o')]  
 });
 ```
 
-OAuth and slash command endpoints will be created for you. The oauth path will be `/oauth` and
-the slash command endpoint will be `/slack/receive`.
+OAuth and slash command endpoints will be created for you. The oauth path will be `/oauth` and the slash command endpoint will be `/slack/receive`.
 
+If required configs are missing, Skellington will exit with a helpful error message to get you up and running.
 
-## Skellington Config Options
+# Built-in Help Commands
 
-Skellington will allow you to create a single team bot for that team or 
-a Slack app capable of multi-team bots, slash commands, and incoming webhooks. 
-These types are mutually exclusive and which type you create depends on the options you pass.
+Want to know what commands your bot supports? Direct mention (`@bot help`) or direct message your bot `help` and your bot 
+will give you a list of help topics. Each plugin you register with your bot can add it's own help commands.
 
-### botkit
+# Skellington Config Options
 
-An optional object of options passed directly to `Botkit.slackbot`.
+Skellington will allow you to create a single team bot for that team or a Slack app capable of multi-team bots, slash commands, 
+and incoming webhooks. These types are mutually exclusive and which type you create depends on the options you pass.
 
-### plugins
+- `botkit` (Array) An optional object of options passed directly to `Botkit.slackbot`.
 
-An array of plugins. See [below](#plugin-api) for details.
+- `plugins` (Array, Required) An array of plugins. See [below](#plugin-api) for details.
 
-### slackToken
+- `port` (Number, Required for Slack App) If passed, will create an express server listening on the port. The express app will be passed to 
+plugins in the `init` and `botConnected` callbacks. The paths `/oauth` and `/slack/receive` are reserved.
 
-**Required for Single Team Bot**
-
-If this is a single team bot, the Slack API token used to connect to the Slack API.
-
-### port
-
-**Required for a Slack App, Optional for a Single Team Bot**
-
-If passed, will create an express server listening on the port. The express app will be passed to plugins in the `init` and `botConnected` callbacks.
-
-### clientId
-
-**Required for a Slack App**
-
-Your Slack OAuth client ID.
-
-### clientSecret
-
-**Required for a Slack App**
-
-Your Slack OAuth client secret.
-
-### redirectUri
-
-**Optional for a Slack App**
-
-A redirect URI to pass to Slack during the OAuth flow.
-If passed, this should be the Skellington host.
-
-
-### successRedirectUri
-
-**Optional for a Slack App**
-
-A URI to for Skellington to redirect to after a successful OAuth
-authentication flow.
-
-
-### errorRedirectUri
-
-**Optional for a Slack App**
-
-A URI to for Skellington to redirect to after a failed OAuth
-authentication flow.
-
-
-
-### state
-
-**Optional for a Slack App**
-
-State that will be returned from Slack as part of the OAuth flow. This is usually used
-to verify the callback from the Identity Provider (Slack, in this case) is legitimate.
-
-### scopes
-
-**Optional for a Slack App**
-
-The [OAuth scopes](https://api.slack.com/docs/oauth-scopes) your app will be requesting. Defaults to no scopes. Scopes can be passed from plugins as well.
-
-### exitOnRtmFailure
-
-**Optional for Single Team Bot**
-
-Whether to exit the process if an RTM connection cannot be established. Defaults to `true`;
-
-### debug
-
-Whether to turn on debug mode. By default this value will be used for the `botkit.debug` option, but this can be overridden
+- `debug` (Boolean) Whether to turn on debug mode. By default this value will be used for the `botkit.debug` option, but this can be overridden
 in the botkit config.
 
-### debugOptions
+- `debugOptions` (Object) Used if `debug` is true. 
 
-Used if `debug` is true. 
-
-`debugOptions.formatter` A formatter function that will be used to log any message to a `hears` call. Will be passed
+  - `debugOptions.formatter` (Function) A formatter function that will be used to log any message to a `hears` call. Will be passed
 the `message` object. Additional debug information will be added onto the message on the `skellington` key.
 
-## Plugin API
 
-### init
+### Single Team Bot Options
+
+- `slackToken` (String, Required) If this is a single team bot, the Slack API token used to connect to the Slack API.
+When `slackToken` is passed, Skellington will create a single team bot. Otherwise Skellington will attempt to build a Slack app.
+
+- `exitOnRtmFailure` (Boolean) Whether to exit the process if an RTM connection cannot be established. Defaults to `true`.
+
+
+### Slack App Options
+
+- `clientId` (String, Required) Your Slack OAuth client ID.
+
+- `clientSecret` (String, Required) Your Slack OAuth client secret.
+
+- `redirectUri` (String) A redirect URI to pass to Slack during the OAuth flow. If passed, Slack will redirect to this URI therefore
+it should be the Skellington host. To redirect from Skellington after the OAuth flow is complete, use
+`successRedirectUri` and `errorRedirectUri`.
+
+- `state` (String) State that will be returned from Slack as part of the OAuth flow. This is usually used
+to verify the callback from the Identity Provider (Slack, in this case) is legitimate.
+
+- `scopes` (Array) The [OAuth scopes](https://api.slack.com/docs/oauth-scopes) your app will be requesting. Defaults to no scopes. Scopes can be passed from plugins as well.
+
+- `successRedirectUri` (String) A URI to for Skellington to redirect to after a successful OAuth
+authentication flow.
+
+- `errorRedirectUri` (String) A URI to for Skellington to redirect to after a failed OAuth
+authentication flow.
+
+
+# Plugin API
+
+### `init`
+
+- `init(controller, bot, expressApp)`
 
 Each plugin passed to Skellington can export an object with an `init` function that will take a botkit `controller`, `bot`,
 and optionally an Express `app` (this will only exist if `config.port` was set). This callback will be called once when Skellington is started.
@@ -164,29 +129,34 @@ module.exports = {
 ```
 
 
-### botConnected
-The `botConnected` callback is called any time a bot connects to an RTM session with Slack. It is called for both Slack Apps
-and single team bots. It has the same method signature as `init`. `botConnected` can be used for building a cache of team specific
-entities (like channels or users) or gather whatever information about a team you could need.
+### `botConnected`
 
-`botConnected` is called for single team bots and Slack apps, though for single team bots it is equivalent (and called at the same moment
-in the lifecycle) as `init`.
+- `botConnected(controller, bot)`
+
+The `botConnected` callback is called any time a bot connects to an RTM session with Slack and is passed a reference to the controller
+and the bot. `botConnected` can be used for building a cache of team specific entities (like channels or users) or gather whatever 
+information about a team you could need.
+
+`botConnected` is called for single team bots and Slack apps, though for single team bots it is called at the same moment
+in the lifecycle as `init`.
 
 It is only fired if the RTM session can be established unlike the Botkit `create_bot` event, which is called after a successful OAuth
-authorization flow, but before an RTM session is established
+authorization flow, but before an RTM session is established.
 
 
 ```js
 module.exports = {
-  botConnected: function(controller, bot, expressApp) {
+  botConnected: function(controller, bot) {
     // do some interesting things with the connected bot!  
   }
 };
 ```
 
 
-### scopes
-For plugins that are specifically for Slack apps, you can pass an array of OAuth [scopes](https://api.slack.com/docs/oauth-scopes) your plugin will require.
+### `scopes`
+- Array 
+
+For plugins that are for Slack apps you can pass an array of OAuth [scopes](https://api.slack.com/docs/oauth-scopes) your plugin will require.
 
 ```js
 module.exports = {
@@ -197,15 +167,17 @@ module.exports = {
 };
 ```
 
-### Adding Help Text
+### `help`
 
-You can optionally include help text for your plugin. To do this, you will need a a `help` object with `command` and `text`
+- Object 
+
+You can optionally include help text for your plugin. This is a great way for  To do this, you will need a a `help` object with `command` and `text`
 properties on your exported object. As in life, `help` is optional, but it does make things easier.
 
-`command`: the command the user will use to get help about your plugin. For example if `command` is `funny gifs`, users
+- `command` (String, required) The command the user will use to get help about your plugin. For example if `command` is `funny gifs`, users
 will get help by typing `@bot help funny gifs`.
 
-`text`: either a string or a function. The string will be displayed as is. If text if a function, it will be passed an
+- `text` (String or function, required) Either a string or a function. The string will be displayed as is. If text if a function, it will be passed an
 options object with the following properties:
 
 | Property | Description |
@@ -216,6 +188,19 @@ options object with the following properties:
 | user     | The ID of the user who initiated the help message. |
 
 ```js
+
+// basic help
+module.exports = {
+  init: function(controller, bot, expressApp) {
+    // initialize plugin
+  },
+  help: {
+    command: 'funny gifs',
+    text: 'They are so funny!'
+  }
+}
+
+// advanced formatting
 module.exports = {
   init: function(controller, bot, expressApp) {
     // initialize plugin
@@ -223,16 +208,24 @@ module.exports = {
   help: {
     command: 'funny gifs',
     text: function(opts) {
-      console.log(`${opts.botName} ${opts.team} ${opts.channel} ${opts.user}`);
+      return `${opts.botName} ${opts.team} ${opts.channel} ${opts.user}`
     }
   }
 };
 ```
 
+## Considerations When Building a Plugin
+
+### Plan for Multiple Teams and Multiple Bots
+
+Your plugin could be part of a Slack app or a single team bot. Users can also be running multiple Skellington bots within 
+the same process, see the [functional tests](test/functional/) for an example. If possible, build your plugin to 
+be stateless, but if you need to build a data store make sure to key it by team ID and/or bot ID.
+
 ### Be Considerate With Data
 
-There will potentially be several other plugins running in the same Skellington instance, so be considerate when you put
-things into the shared Botkit storage. Namespace any data specific to your plugin and don't modify things you didn't set.
+Assume there will be several other plugins running in the same Skellington instance, so be considerate when you put
+things into the shared storage. Namespace any data specific to your plugin and don't modify things you didn't set.
 
 When you read from storage, remember to always merge your updates with what was present in storage before.
 Here's an example of how to do that using lodash's `merge` method:
@@ -243,7 +236,7 @@ controller.storage.teams.get('teamId', function(err, team) {
   var mergedData = _.merge({id: 'teamId'}, team, myTeamData);
   controller.storage.teams.save(mergedData, function(err) {
     console.log('data updated!')
-  });
+  })
 })
 ```
 
@@ -251,3 +244,4 @@ controller.storage.teams.get('teamId', function(err, team) {
 
 If you are adding additional routes to the express app use a namespaced path,
 like `/funny-gifs/endpoint`. Don't add things to the root path, those are likely to conflict with another bot.
+The paths `/oauth` and `/slack/receive` are reserved.
