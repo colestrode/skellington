@@ -62,7 +62,8 @@ describe('server', function () {
       reqMock = {}
       resMock = {
         status: sinon.stub(),
-        send: sinon.stub()
+        send: sinon.stub(),
+        redirect: sinon.stub()
       }
 
       resMock.status.returns(resMock)
@@ -74,6 +75,12 @@ describe('server', function () {
       expect(resMock.send).to.have.been.called
     })
 
+    it('should redirect to successRedirect on success', function() {
+      testConfig.successRedirectUri = 'https://dont.evenworryabout.it'
+      oauthCallback(null, reqMock, resMock)
+      expect(resMock.redirect).to.have.been.calledWith(testConfig.successRedirectUri)
+    });
+
     it('should respond with a 500 and error if oauth fails', function () {
       utilsMock.logError.reset()
 
@@ -82,5 +89,12 @@ describe('server', function () {
       expect(resMock.status).to.have.been.calledWith(500)
       expect(resMock.send).to.have.been.called
     })
+
+    it('should redirect to errorRedirect on error', function() {
+      testConfig.errorRedirectUri = 'https://iwill.evenworryabout.it'
+      oauthCallback(err, reqMock, resMock)
+      expect(resMock.redirect).to.have.been.calledWith(testConfig.errorRedirectUri)
+    });
+
   })
 })

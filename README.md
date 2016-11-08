@@ -88,6 +88,25 @@ Your Slack OAuth client secret.
 **Optional for a Slack App**
 
 A redirect URI to pass to Slack during the OAuth flow.
+If passed, this should be the Skellington host.
+
+
+### successRedirectUri
+
+**Optional for a Slack App**
+
+A URI to for Skellington to redirect to after a successful OAuth
+authentication flow.
+
+
+### errorRedirectUri
+
+**Optional for a Slack App**
+
+A URI to for Skellington to redirect to after a failed OAuth
+authentication flow.
+
+
 
 ### state
 
