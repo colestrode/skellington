@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Beautiful new logo from [@jasonrhodes](https://github.com/jasonrhodes)!
+- Beautiful new logo from @jasonrhodes!
 - Debug mode for logging all messages to `controller.hears` calls.
 
 ### Changed
