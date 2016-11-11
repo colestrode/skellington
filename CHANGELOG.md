@@ -10,13 +10,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Beautiful new logo from [@jasonrhodes](https://github.com/jasonrhodes)!
-- Debug mode for logging all messages to `controller.hears` calls.
+- Debug mode for logging all messages to `controller.hears` calls. Adds a `skellington` key to the message object.
+- Skellington instance returned from exported function. There's not much here until you turn on debug mode.
 
 ### Changed
 
 - Support for Slack apps! (So much work for one line in the change log.)
 - Adds `botConnected` callback triggered on successful connection to the Slack RTM API.
 - Botkit.slackbot configs are now in the `botkit` config stanza. This will future-proof the config options and prevent collisions.
+- Botkit dependency is now `^` matched to help bug fixes and new features propagate quicker.
 
 ## 0.2.0
 
