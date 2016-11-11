@@ -56,12 +56,12 @@ will give you a list of help topics. Each plugin you register with your bot can 
 Skellington will allow you to create a single team bot for that team or a Slack app capable of multi-team bots, slash commands, 
 and incoming webhooks. These types are mutually exclusive and which type you create depends on the options you pass.
 
-- `botkit` (Array) An optional object of options passed directly to `Botkit.slackbot`.
+- `botkit` (Object) An optional object of options passed directly to `Botkit.slackbot`.
 
 - `plugins` (Array, Required) An array of plugins. See [below](#plugin-api) for details.
 
 - `port` (Number, Required for Slack App) If passed, will create an express server listening on the port. The express app will be passed to 
-plugins in the `init` and `botConnected` callbacks. The paths `/oauth` and `/slack/receive` are reserved.
+plugins in the `init` callback. The paths `/oauth` and `/slack/receive` are reserved.
 
 - `debug` (Boolean) Whether to turn on debug mode. By default this value will be used for the `botkit.debug` option, but this can be overridden
 in the botkit config.
