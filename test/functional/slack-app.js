@@ -17,6 +17,7 @@ const instance = require('../../index')({
   clientSecret: process.env.CLIENT_SECRET,
   port: process.env.PORT,
   debug: true,
+  successRedirectUri: 'https://www.google.com',
   debugOptions: {
     formatter: function (message) {
       return `slackApp: ${message.text} ${message.skellington.file}`
@@ -26,16 +27,33 @@ const instance = require('../../index')({
     json_file_store: './db-app/',
     debug: false
   },
-  plugins: [{init: init, botConnected: botConnected}]
+  plugins: [{init: init, botConnected: botConnected}, {init: anotherInit}]
 })
 
 function init (controller) {
   controller.on('slash_command', (bot, message) => {
+    if (message.command !== '/rick') {
+      return true
+    }
+
     bot.replyPrivate(message, 'WUBALUBDUBDUB')
+    return false // stop event propagation
   })
 
   controller.hears('hello', 'direct_message', (bot, message) => {
     bot.reply(message, 'WHAT?')
+  })
+}
+
+function anotherInit (controller) {
+  // register a second slash command
+  controller.on('slash_command', (bot, message) => {
+    if (message.command !== '/morty') {
+      return true
+    }
+
+    bot.replyPrivate(message, `I don't know about this Rick!`)
+    return false // stop event propagation
   })
 }
 
