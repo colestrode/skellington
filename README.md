@@ -108,10 +108,10 @@ in Botkit will be automatically picked up each time you install Skellington. Thi
 
 Note: Botkit is currently in 0.X.Y versioning, so a `^` match will only pick up "patch" releases.
 
-When/if Botkit publishes a breaking change, I will file an Skellington issue to track it and for the community to comment on.
+When/if Botkit publishes a breaking change, I will file a Skellington issue to track it and for the community to comment on.
 The subsequent Skellington version bump will either be a minor or major release, depending on the impact.
 
-If you find an issue with a Botkit version, please file an [issue](https://github.com/colestrode/skellington/issues/).
+If you find an issue related to a Botkit version picked up by Skellington, please file an [issue](https://github.com/colestrode/skellington/issues/).
 
 ## Tips on Managing the Botkit Dependency
 
