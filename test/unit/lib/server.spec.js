@@ -9,17 +9,18 @@ chai.use(require('sinon-chai'))
 
 describe('server', function () {
   let testConfig
-  let utilsMock
+  let loggerMock
   let controllerMock
   let err
   let server
 
   beforeEach(function () {
-    utilsMock = {
-      logError: sinon.stub()
-    }
-
     testConfig = {port: 1234}
+
+    loggerMock = {
+      info: sinon.stub(),
+      error: sinon.stub()
+    }
 
     controllerMock = {
       webserver: 'webserver',
@@ -31,7 +32,7 @@ describe('server', function () {
     err = new Error('GUSFRING')
 
     server = proxyquire('../../../lib/server', {
-      './utils': utilsMock
+      './logger': loggerMock
     })
   })
 
@@ -82,10 +83,7 @@ describe('server', function () {
     });
 
     it('should respond with a 500 and error if oauth fails', function () {
-      utilsMock.logError.reset()
-
       oauthCallback(err, reqMock, resMock)
-      expect(utilsMock.logError).to.have.been.calledWith(controllerMock, err)
       expect(resMock.status).to.have.been.calledWith(500)
       expect(resMock.send).to.have.been.called
     })

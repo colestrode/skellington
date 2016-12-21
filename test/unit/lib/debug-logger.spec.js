@@ -1,8 +1,9 @@
 'use strict'
 
-var chai = require('chai')
-var expect = chai.expect
-var sinon = require('sinon')
+const chai = require('chai')
+const expect = chai.expect
+const sinon = require('sinon')
+const proxyquire = require('proxyquire')
 
 chai.use(require('sinon-chai'))
 
@@ -14,15 +15,19 @@ describe('Debug Logger', function () {
   let events
   let messageMock
   let hearsMock
+  let loggerMock
 
   beforeEach(function () {
     hearsMock = sinon.stub()
     messageMock = {}
 
     controllerMock = {
-      log: sinon.stub(),
       hears_test: sinon.stub().returns(true),
       hears: hearsMock
+    }
+
+    loggerMock = {
+      info: sinon.stub()
     }
 
     testConfig = {}
@@ -31,7 +36,9 @@ describe('Debug Logger', function () {
 
     events = ['white']
 
-    logger = require('../../../lib/debug-logger')
+    logger = proxyquire('../../../lib/debug-logger', {
+      './logger': loggerMock
+    })
   })
 
   function getLoggingMiddleware () {
@@ -46,7 +53,7 @@ describe('Debug Logger', function () {
     expect(hearsMock).to.have.been.called
     loggingMiddleware(patterns, messageMock)
     expect(controllerMock.hears_test).to.have.been.calledWith(patterns, messageMock)
-    expect(controllerMock.log).to.have.been.called
+    expect(loggerMock.info).to.have.been.called
   })
 
   it('should not log if default hears_test returns false', function () {
@@ -55,7 +62,7 @@ describe('Debug Logger', function () {
     const loggingMiddleware = getLoggingMiddleware()
 
     loggingMiddleware(patterns, messageMock)
-    expect(controllerMock.log).not.to.have.been.called
+    expect(loggerMock.info).not.to.have.been.called
   })
 
   it('should log if middleware returns true', function () {
@@ -68,7 +75,7 @@ describe('Debug Logger', function () {
     loggingMiddleware(patterns, messageMock)
     expect(middleware).to.have.been.called
     expect(controllerMock.hears_test).not.to.have.been.called
-    expect(controllerMock.log).to.have.been.called
+    expect(loggerMock.info).to.have.been.called
   })
 
   it('should not log if middleware returns false', function () {
@@ -80,7 +87,7 @@ describe('Debug Logger', function () {
 
     loggingMiddleware(patterns, messageMock)
     expect(middleware).to.have.been.called
-    expect(controllerMock.log).not.to.have.been.called
+    expect(loggerMock.info).not.to.have.been.called
   })
 
   it('should allow formatter to be overwritten', function () {

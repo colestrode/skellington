@@ -10,7 +10,7 @@ chai.use(require('sinon-chai'))
 describe('plugin-lifecycle', function () {
   let controllerMock
   let botMock
-  let utilsMock
+  let loggerMock
   let lifecycle
 
   beforeEach(function () {
@@ -20,12 +20,13 @@ describe('plugin-lifecycle', function () {
 
     botMock = 'bottttt'
 
-    utilsMock = {
-      logError: sinon.stub()
+    loggerMock = {
+      info: sinon.stub(),
+      error: sinon.stub()
     }
 
     lifecycle = proxyquire('../../../lib/plugin-lifecycle', {
-      './utils': utilsMock
+      './logger': loggerMock
     })
   })
 
