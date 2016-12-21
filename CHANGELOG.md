@@ -5,7 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [1.0.0](https://github.com/Skellington-Closet/skellington/compare/v0.2.0...v1.0.0)
+## [1.1.0](https://github.com/Skellington-Closet/skellington/compare/v1.0.0...v1.1.0)
+
+### Added
+
+- New `logger` option.
+
+### Changed
+
+- Default Botkit logger now uses [Skellington Logger](https://github.com/Skellington-Closet/skellington-logger)
+- Skellington uses its own logger instead of piggy-backing on Botkit's logger.
+
+
+## [1.0.0](https://github.com/colestrode/skellington/compare/v0.2.0...v1.0.0)
 
 ### Added
 

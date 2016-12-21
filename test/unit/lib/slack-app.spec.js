@@ -16,6 +16,7 @@ describe('slack-app', function () {
   let botMock
   let lifecycleMock
   let utilsMock
+  let loggerMock
   let err
   let slackApp
 
@@ -42,8 +43,12 @@ describe('slack-app', function () {
       botConnected: sinon.stub()
     }
 
+    loggerMock = {
+      error: sinon.stub(),
+      info: sinon.stub()
+    }
+
     utilsMock = {
-      logError: sinon.stub(),
       identity: sinon.stub()
     }
 
@@ -82,7 +87,8 @@ describe('slack-app', function () {
 
     slackApp = proxyquire('../../../lib/slack-app', {
       './plugin-lifecycle': lifecycleMock,
-      './utils': utilsMock
+      './utils': utilsMock,
+      './logger': loggerMock
     })
   })
 

@@ -18,6 +18,9 @@ describe('Skellington', function () {
   let utilsMock
   let singleBotMock
   let slackAppMock
+  let loggerInstanceMock
+  let skellingtonLoggerMock
+  let loggerLibMock
 
   beforeEach(function () {
     controllerMock = {}
@@ -27,6 +30,19 @@ describe('Skellington', function () {
     }
 
     sinon.stub(process, 'exit')
+
+    loggerInstanceMock = {
+      setLogger: sinon.stub(),
+      info: sinon.stub(),
+      error: sinon.stub()
+    }
+    loggerInstanceMock.setLogger.returns(loggerInstanceMock)
+
+    loggerLibMock = {
+      setLogger: sinon.stub().returns(loggerInstanceMock)
+    }
+
+    skellingtonLoggerMock = sinon.stub().returnsArg(0)
 
     debugLoggerMock = {
       addLogger: sinon.stub()
@@ -54,9 +70,11 @@ describe('Skellington', function () {
 
     skellington = proxyquire('../../index', {
       'botkit': botkitMock,
+      'skellington-logger': skellingtonLoggerMock,
       './lib/debug-logger': debugLoggerMock,
       './lib/server': serverMock,
       './lib/help': helpMock,
+      './lib/logger': loggerLibMock,
       './lib/utils': utilsMock,
       './lib/slack-app': slackAppMock,
       './lib/single-team-bot': singleBotMock
@@ -92,6 +110,7 @@ describe('Skellington', function () {
       const expectedConfg = _.clone(testConfig.botkit)
       expectedConfg.status_optout = true
       expectedConfg.debug = false
+      expectedConfg.logger = skellingtonLoggerMock('botkit')
 
       skellington(testConfig)
       expect(botkitMock.slackbot).to.have.been.calledWith(expectedConfg)
@@ -100,7 +119,8 @@ describe('Skellington', function () {
     it('should pass defaults to botkit if no botkit config is passed', function () {
       const expectedConfg = {
         debug: false,
-        status_optout: true
+        status_optout: true,
+        logger: skellingtonLoggerMock('botkit')
       }
 
       delete testConfig.botkit
@@ -114,6 +134,14 @@ describe('Skellington', function () {
       testConfig.debug = true
       const instance = skellington(testConfig)
       expect(instance.__config.plugins).to.be.an('array')
+    })
+
+    it('should set logger from config', function () {
+      const newLogger = 'new'
+
+      testConfig.logger = newLogger
+      skellington(testConfig)
+      expect(loggerInstanceMock.setLogger).to.have.been.calledWith(newLogger)
     })
 
     it('should flatten scopes', function () {

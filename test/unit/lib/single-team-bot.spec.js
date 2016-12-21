@@ -14,6 +14,7 @@ describe('single-team-bot', function () {
   let controllerMock
   let lifecycleMock
   let utilsMock
+  let loggerMock
   let err
   let singleTeamBot
 
@@ -44,8 +45,12 @@ describe('single-team-bot', function () {
     }
 
     utilsMock = {
-      logError: sinon.stub(),
       identity: sinon.stub()
+    }
+
+    loggerMock = {
+      error: sinon.stub(),
+      info: sinon.stub()
     }
 
     sinon.stub(process, 'exit')
@@ -54,7 +59,8 @@ describe('single-team-bot', function () {
 
     singleTeamBot = proxyquire('../../../lib/single-team-bot', {
       './plugin-lifecycle': lifecycleMock,
-      './utils': utilsMock
+      './utils': utilsMock,
+      './logger': loggerMock
     })
   })
 
