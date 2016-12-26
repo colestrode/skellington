@@ -1,7 +1,7 @@
 <img src="site/assets/images/logo-0.1-horizontal.png" alt="Skellington: the logo is jack the chat bubble, get it???" style="max-width: 500px; display:block; margin: 0 0 20px;">
 
-[![Build Status](https://travis-ci.org/colestrode/skellington.svg?branch=master)](https://travis-ci.org/colestrode/skellington)
-[![Coverage Status](https://coveralls.io/repos/github/colestrode/skellington/badge.svg?branch=master)](https://coveralls.io/github/colestrode/skellington?branch=master)
+[![Build Status](https://travis-ci.org/Skellington-Closet/skellington.svg?branch=master)](https://travis-ci.org/Skellington-Closet/skellington)
+[![Coverage Status](https://coveralls.io/repos/github/Skellington-Closet/skellington/badge.svg?branch=master)](https://coveralls.io/github/Skellington-Closet/skellington?branch=master)
 [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
 The skeleton for your Slack bots.
@@ -111,7 +111,7 @@ Note: Botkit is currently in 0.X.Y versioning, so a `^` match will only pick up 
 When/if Botkit publishes a breaking change, I will file a Skellington issue to track it and for the community to comment on.
 The subsequent Skellington version bump will either be a minor or major release, depending on the impact.
 
-If you find an issue related to a Botkit version picked up by Skellington, please file an [issue](https://github.com/colestrode/skellington/issues/).
+If you find an issue related to a Botkit version picked up by Skellington, please file an [issue](https://github.com/Skellington-Closet/skellington/issues/).
 
 ## Tips on Managing the Botkit Dependency
 
@@ -119,7 +119,7 @@ If you find an issue related to a Botkit version picked up by Skellington, pleas
 - Test your bot before you deploy to production. Fire it up and click around and look for anything weird (don't forget to check your logs).
 - If you run into an issue due to a Botkit bug, try downgrading Botkit:
   - `cd node_modules/skellington && npm install botkit@<version> && cd ../..`
-  - If this solves the issue, shrinkwrap your bot and please file an [issue](https://github.com/colestrode/skellington/issues/). 
+  - If this solves the issue, shrinkwrap your bot and please file an [issue](https://github.com/Skellington-Closet/skellington/issues/). 
 
 
 # Plugin API
