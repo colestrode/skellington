@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Skellington uses its own logger instead of piggy-backing on Botkit's logger.
 
 
-## [1.0.0](https://github.com/colestrode/skellington/compare/v0.2.0...v1.0.0)
+## [1.0.0](https://github.com/Skellington-Closet/skellington/compare/v0.2.0...v1.0.0)
 
 ### Added
 
