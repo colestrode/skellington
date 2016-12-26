@@ -111,7 +111,7 @@ Note: Botkit is currently in 0.X.Y versioning, so a `^` match will only pick up 
 When/if Botkit publishes a breaking change, I will file a Skellington issue to track it and for the community to comment on.
 The subsequent Skellington version bump will either be a minor or major release, depending on the impact.
 
-If you find an issue related to a Botkit version picked up by Skellington, please file an [issue](https://github.com/colestrode/skellington/issues/).
+If you find an issue related to a Botkit version picked up by Skellington, please file an [issue](https://github.com/Skellington-Closet/skellington/issues/).
 
 ## Tips on Managing the Botkit Dependency
 
@@ -119,7 +119,7 @@ If you find an issue related to a Botkit version picked up by Skellington, pleas
 - Test your bot before you deploy to production. Fire it up and click around and look for anything weird (don't forget to check your logs).
 - If you run into an issue due to a Botkit bug, try downgrading Botkit:
   - `cd node_modules/skellington && npm install botkit@<version> && cd ../..`
-  - If this solves the issue, shrinkwrap your bot and please file an [issue](https://github.com/colestrode/skellington/issues/). 
+  - If this solves the issue, shrinkwrap your bot and please file an [issue](https://github.com/Skellington-Closet/skellington/issues/). 
 
 
 # Plugin API

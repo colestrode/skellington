@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [1.0.0](https://github.com/colestrode/skellington/compare/v0.2.0...v1.0.0)
+## [1.0.0](https://github.com/Skellington-Closet/skellington/compare/v0.2.0...v1.0.0)
 
 ### Added
 
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Botkit.slackbot configs are now in the `botkit` config stanza. This will future-proof the config options and prevent collisions.
 - Botkit dependency is now `^` matched to help bug fixes and new features propagate quicker.
 
-## [0.2.0](https://github.com/colestrode/skellington/compare/v0.1.1...v0.2.0)
+## [0.2.0](https://github.com/Skellington-Closet/skellington/compare/v0.1.1...v0.2.0)
 
 ### Changed
 
@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Support for the undocumented feature of auto-detecting Slack API token from environment variables.
 
-## [0.1.1](https://github.com/colestrode/skellington/compare/2b513a732fbb3d9c3bc4bb583e34fc4dfe9e7dd4...v0.1.1)
+## [0.1.1](https://github.com/Skellington-Closet/skellington/compare/2b513a732fbb3d9c3bc4bb583e34fc4dfe9e7dd4...v0.1.1)
 
 ### Changed
 
