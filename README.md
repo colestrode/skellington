@@ -1,7 +1,7 @@
 <img src="site/assets/images/logo-0.1-horizontal.png" alt="Skellington: the logo is jack the chat bubble, get it???" style="max-width: 500px; display:block; margin: 0 0 20px;">
 
-[![Build Status](https://travis-ci.org/colestrode/skellington.svg?branch=master)](https://travis-ci.org/colestrode/skellington)
-[![Coverage Status](https://coveralls.io/repos/github/colestrode/skellington/badge.svg?branch=master)](https://coveralls.io/github/colestrode/skellington?branch=master)
+[![Build Status](https://travis-ci.org/Skellington-Closet/skellington.svg?branch=master)](https://travis-ci.org/Skellington-Closet/skellington)
+[![Coverage Status](https://coveralls.io/repos/github/Skellington-Closet/skellington/badge.svg?branch=master)](https://coveralls.io/github/Skellington-Closet/skellington?branch=master)
 [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
 The skeleton for your Slack bots.
