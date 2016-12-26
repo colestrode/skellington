@@ -2,22 +2,29 @@
 
 const Botkit = require('botkit')
 const _ = require('lodash')
+const defaultLogger = require('skellington-logger')('skellington')
+const logger = require('./lib/logger').setLogger(defaultLogger)
 const debugLogger = require('./lib/debug-logger')
 const server = require('./lib/server')
 const help = require('./lib/help')
-const utils = require('./lib/utils')
 
 const botkitDefaults = {
   debug: false,
-  status_optout: true
+  status_optout: true,
+  logger: require('skellington-logger')('botkit')
 }
 
 module.exports = (cfg) => {
   const instance = {}
   const config = _.cloneDeep(cfg)
-  const controller = Botkit.slackbot(getSlackbotConfig(config))
 
-  formatConfig(config, controller)
+  if (config.logger) {
+    logger.setLogger(config.logger)
+  }
+
+  formatConfig(config)
+
+  const controller = Botkit.slackbot(getSlackbotConfig(config))
 
   // start debugging before help listeners are added
   if (config.debug) {
@@ -52,9 +59,8 @@ function getSlackbotConfig (config) {
  * Formats config values so they are normalized, will exit the process with an error if required config is missing
  *
  * @param config
- * @param controller
  */
-function formatConfig (config, controller) {
+function formatConfig (config) {
   _.defaults(config, {debug: false, plugins: []})
 
   config.debugOptions = config.debugOptions || {}
@@ -75,7 +81,7 @@ function formatConfig (config, controller) {
   config.isSlackApp = !config.slackToken
 
   if (!config.slackToken && !(config.clientId && config.clientSecret && config.port)) {
-    utils.logError(controller, new Error('Missing configuration. Config must include either slackToken AND/OR clientId, clientSecret, and port'))
+    logger.error(`Missing configuration. Config must include either slackToken AND/OR clientId, clientSecret, and port`)
     process.exit(1)
   }
 }
