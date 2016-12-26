@@ -58,6 +58,8 @@ and incoming webhooks. These types are mutually exclusive and which type you cre
 
 - `botkit` (Object) An optional object of options passed directly to `Botkit.slackbot`.
 
+- `logger` (Object) A custom logger, defaults to Skellington's internal logging. Logger must implement `debug`, `info`, and `error` methods.
+
 - `plugins` (Array, Required) An array of plugins. See [below](#plugin-api) for details.
 
 - `port` (Number, Required for Slack App) If passed, will create an express server listening on the port. The express app will be passed to 
