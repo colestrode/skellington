@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.1](https://github.com/Skellington-Closet/skellington/compare/v1.1.0...v1.1.1)
+
+### Changed
+
+- Skellington will no longer attempt to reconnect on the `rtm_close` event and will instead defer to Botkit's reconnection strategy.
+This fixes a bug where Skellington can reconnect twice causing multiple responses. See issue #44 for more details.
 
 ## [1.1.0](https://github.com/Skellington-Closet/skellington/compare/v1.0.0...v1.1.0)
 
