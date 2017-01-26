@@ -84,8 +84,6 @@ describe('single-team-bot', function () {
     expect(controllerMock.spawn).to.have.been.calledWith({token: 'abc123'})
     expect(botMock.startRTM).to.have.been.called
     expect(process.exit).to.have.been.calledWith(1)
-    expect(lifecycleMock.initialize).not.to.have.been.called
-    expect(lifecycleMock.botConnected).not.to.have.been.called
   })
 
   it('should not exit if starting rtm fails and exitOnRtmFailure is false', function () {
@@ -100,7 +98,7 @@ describe('single-team-bot', function () {
     expect(lifecycleMock.botConnected).not.to.have.been.called
   })
 
-  describe('rtm_close', function () {
+  describe('rtm_reconnect_failed', function () {
     let callback
 
     function getRTMCallback (config) {
@@ -112,34 +110,20 @@ describe('single-team-bot', function () {
       return controllerMock.on.args[0][1]
     }
 
-    it('should reconnect', function () {
-      callback = getRTMCallback({slackToken: 'abc'})
+    it('should exit if exitOnRtmFailure is not false', function () {
+      const config = {slackToken: 'abc'}
+      callback = getRTMCallback(config)
+      callback(botMock, err)
 
-      callback(botMock)
-      expect(botMock.startRTM).to.be.calledOnce
+      expect(process.exit).to.have.been.calledWith(1)
     })
 
-    it('should exit if reconnect fails', function () {
-      let error = new Error('GAZORPAZORP')
-      callback = getRTMCallback({slackToken: 'abc'})
+    it('should not exit if exitOnRtmFailure is false', function () {
+      const config = {slackToken: 'abc', exitOnRtmFailure: false}
+      callback = getRTMCallback(config)
+      callback(botMock, err)
 
-      botMock.startRTM.yields(error)
-
-      callback(botMock)
-      expect(botMock.startRTM).to.be.calledOnce
-      expect(process.exit).to.be.calledWith(1)
-    })
-
-    it('should not exit if reconnect fails and exitOnRtmFailure is false', function () {
-      let error = new Error('GAZORPAZORP')
-
-      callback = getRTMCallback({slackToken: 'abc', exitOnRtmFailure: false})
-
-      botMock.startRTM.yields(error)
-
-      callback(botMock)
-      expect(botMock.startRTM).to.be.calledOnce
-      expect(process.exit).not.to.be.called
+      expect(process.exit).not.to.have.been.called
     })
   })
 })

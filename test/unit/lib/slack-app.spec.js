@@ -220,7 +220,7 @@ describe('slack-app', function () {
       expect(lifecycleMock.botConnected).to.have.been.calledOnce
     })
 
-    it('should exit if rtm fails', function () {
+    it('should not call botConnected when rtm cannot connect', function () {
       newBot.startRTM.yields(err)
       callback(newBot)
       expect(newBot.startRTM).to.have.been.called
@@ -228,7 +228,7 @@ describe('slack-app', function () {
     })
   })
 
-  describe('event: rtm_close', function () {
+  describe('event: rtm_reconnect_failed', function () {
     let callback
 
     beforeEach(function () {
@@ -237,21 +237,13 @@ describe('slack-app', function () {
       botMock.startRTM.reset()
       botMock.startRTM.yields(null)
 
-      callback = getOnCallback('rtm_close')
+      callback = getOnCallback('rtm_reconnect_failed')
     })
 
-    it('should reconnect', function () {
-      callback(botMock)
-      expect(botMock.startRTM).to.be.calledOnce
-    })
-
-    it('should not exit if reconnect fails', function () {
-      let error = new Error('GAZORPAZORP')
-      botMock.startRTM.yields(error)
-
-      callback(botMock)
-      expect(botMock.startRTM).to.be.calledOnce
-      expect(process.exit).not.to.be.called
+    it('should remove team', function () {
+      sinon.spy(testConfig.connectedTeams, 'delete')
+      callback(botMock, err)
+      expect(testConfig.connectedTeams.delete).to.have.been.calledWith(botMock.team_info.id)
     })
   })
 })
