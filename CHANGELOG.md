@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.2](https://github.com/Skellington-Closet/skellington/compare/v1.1.1...v1.1.2)
+
+### Changed
+
+- Fixes typo for default Botkit configs. Skellington should now correctly disable Botkit studio stats collection by default.
+Skellington always supported passing in the `stats_optout` option throught the `botkit` config key, this only affected default behavior.
+
+
 ## [1.1.1](https://github.com/Skellington-Closet/skellington/compare/v1.1.0...v1.1.1)
 
 ### Changed
