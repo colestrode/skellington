@@ -10,7 +10,7 @@ const help = require('./lib/help')
 
 const botkitDefaults = {
   debug: false,
-  status_optout: true,
+  stats_optout: true,
   logger: require('skellington-logger')('botkit')
 }
 
