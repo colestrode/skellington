@@ -108,7 +108,7 @@ describe('Skellington', function () {
 
     it('should pass botkit config to botkit with defaults', function () {
       const expectedConfg = _.clone(testConfig.botkit)
-      expectedConfg.status_optout = true
+      expectedConfg.stats_optout = true
       expectedConfg.debug = false
       expectedConfg.logger = skellingtonLoggerMock('botkit')
 
@@ -119,7 +119,7 @@ describe('Skellington', function () {
     it('should pass defaults to botkit if no botkit config is passed', function () {
       const expectedConfg = {
         debug: false,
-        status_optout: true,
+        stats_optout: true,
         logger: skellingtonLoggerMock('botkit')
       }
 
