@@ -1,88 +1,64 @@
 'use strict'
 
-const Botkit = require('botkit')
 const _ = require('lodash')
-const defaultLogger = require('skellington-logger')('skellington')
-const logger = require('./lib/logger').setLogger(defaultLogger)
-const debugLogger = require('./lib/debug-logger')
-const server = require('./lib/server')
-const help = require('./lib/help')
-
-const botkitDefaults = {
-  debug: false,
-  stats_optout: true,
-  logger: require('skellington-logger')('botkit')
-}
+let logger = require('skellington-logger')('skellington')
 
 module.exports = (cfg) => {
   const instance = {}
-  const config = _.cloneDeep(cfg)
+  const config = _.defaults(_.cloneDeep(cfg), {debug: false, plugins: [], engines: []})
 
   if (config.logger) {
-    logger.setLogger(config.logger)
+    logger = config.logger
   }
 
-  formatConfig(config)
-
-  const controller = Botkit.slackbot(getSlackbotConfig(config))
-
-  // start debugging before help listeners are added
-  if (config.debug) {
-    instance.__config = config // expose internal config during debug mode
-    debugLogger.addLogger(controller, config.debugOptions)
-  }
-
-  help.addHelpListeners(controller, config.plugins)
-
-  if (config.port) {
-    server.start(controller, config)
-  }
-
-  if (config.isSlackApp) {
-    require('./lib/slack-app').start(controller, config)
-  } else {
-    require('./lib/single-team-bot').start(controller, config)
-  }
-
+  startYourEngines(config)
   return instance
 }
 
-/**
- * Gets the config object for Botkit.slackbot
- * @param config
- */
-function getSlackbotConfig (config) {
-  return _.defaults(config.botkit, {debug: !!config.debug}, botkitDefaults)
+function startYourEngines(config) {
+  const pluginsByType = _.groupBy(config.plugins, (plugin) => plugin.type)
+
+  _.forEach(config.engines, (engine) => {
+    try {
+      const engineConf = _.defaults({}, config[engine.type], { logger })
+      engine.bootstrap(engineConf)
+
+      // only add help and plugins if engine was successfully bootstrapped
+      addHelp(engine, pluginsByType)
+      addPlugins(engine, pluginsByType)
+    } catch(e) {
+      logger.error(`Error bootstrapping engine ${engine.type}`, e)
+    }
+  })
 }
 
-/**
- * Formats config values so they are normalized, will exit the process with an error if required config is missing
- *
- * @param config
- */
-function formatConfig (config) {
-  _.defaults(config, {debug: false, plugins: []})
-
-  config.debugOptions = config.debugOptions || {}
-  config.connectedTeams = new Set()
-
-  if (!Array.isArray(config.plugins)) {
-    config.plugins = [config.plugins]
+function addHelp(engine, pluginsByType) {
+  try {
+    engine.addHelp(helpArray(engine.type, pluginsByType))
+  } catch(e) {
+    logger.error(`Error adding help text for engine ${engine.type}`, e)
   }
+}
 
-  config.scopes = _.chain(config.plugins)
-    .map('scopes')
-    .flatten()
-    .concat(_.isArray(config.scopes) ? config.scopes : [])
-    .uniq()
-    .remove(_.isString.bind(_))
+function helpArray(engineType, pluginsByType) {
+  return _.chain(pluginsByType[engineType])
+    .filter((plugin) => plugin.help && plugin.help.keyword && plugin.help.text)
+    .map((plugin) => {
+      const help = plugin.help
+      help.name = plugin.name
+      return help
+    })
     .value()
+}
 
-  config.isSlackApp = !config.slackToken
-
-  if (!config.slackToken && !(config.clientId && config.clientSecret && config.port)) {
-    logger.error(`Missing configuration. Config must include either slackToken AND/OR clientId, clientSecret, and port`)
-    process.exit(1)
+function addPlugins(engine, pluginsByType) {
+  try {
+    engine.addPlugins(pluginArray(engine.type, pluginsByType))
+  } catch(e) {
+    logger.error(`Error adding plugins for engine ${engine.type}`, e)
   }
 }
 
+function pluginArray(engineType, pluginsByType) {
+  return _.map(pluginsByType[engineType], (plugin) => _.omit(plugin, 'help'))
+}
