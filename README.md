@@ -8,6 +8,8 @@ The skeleton for your Slack bots.
 
 # Composable Slack Bots
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Skellington-Closet/skellington.svg)](https://greenkeeper.io/)
+
 Skellington is a skeleton for your [Botkit](https://github.com/howdyai/botkit) Slack bots. It handles the boilerplate connection
 and error handling and let's you get down to the business of bot-making. You can write a new bot in just a few of lines of code! 
 
