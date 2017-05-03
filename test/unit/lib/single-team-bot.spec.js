@@ -6,6 +6,7 @@ const sinon = require('sinon')
 const proxyquire = require('proxyquire').noCallThru()
 
 chai.use(require('sinon-chai'))
+chai.use(require('dirty-chai'))
 
 describe('single-team-bot', function () {
   let testConfig
@@ -72,9 +73,9 @@ describe('single-team-bot', function () {
     singleTeamBot.start(controllerMock, testConfig)
 
     expect(controllerMock.spawn).to.have.been.calledWith({token: 'abc123'})
-    expect(botMock.startRTM).to.have.been.called
-    expect(lifecycleMock.initialize).to.have.been.called
-    expect(lifecycleMock.botConnected).to.have.been.called
+    expect(botMock.startRTM).to.have.been.called()
+    expect(lifecycleMock.initialize).to.have.been.called()
+    expect(lifecycleMock.botConnected).to.have.been.called()
   })
 
   it('should exit if starting rtm fails', function () {
@@ -82,7 +83,7 @@ describe('single-team-bot', function () {
     singleTeamBot.start(controllerMock, testConfig)
 
     expect(controllerMock.spawn).to.have.been.calledWith({token: 'abc123'})
-    expect(botMock.startRTM).to.have.been.called
+    expect(botMock.startRTM).to.have.been.called()
     expect(process.exit).to.have.been.calledWith(1)
   })
 
@@ -92,10 +93,10 @@ describe('single-team-bot', function () {
     singleTeamBot.start(controllerMock, testConfig)
 
     expect(controllerMock.spawn).to.have.been.calledWith({token: 'abc123'})
-    expect(botMock.startRTM).to.have.been.called
-    expect(process.exit).not.to.have.been.called
-    expect(lifecycleMock.initialize).not.to.have.been.called
-    expect(lifecycleMock.botConnected).not.to.have.been.called
+    expect(botMock.startRTM).to.have.been.called()
+    expect(process.exit).not.to.have.been.called()
+    expect(lifecycleMock.initialize).not.to.have.been.called()
+    expect(lifecycleMock.botConnected).not.to.have.been.called()
   })
 
   describe('rtm_reconnect_failed', function () {
@@ -123,7 +124,7 @@ describe('single-team-bot', function () {
       callback = getRTMCallback(config)
       callback(botMock, err)
 
-      expect(process.exit).not.to.have.been.called
+      expect(process.exit).not.to.have.been.called()
     })
   })
 })

@@ -3,6 +3,8 @@
 const chai = require('chai')
 const expect = chai.expect
 
+chai.use(require('dirty-chai'))
+
 describe('logger', function () {
   let logger
 
@@ -15,7 +17,7 @@ describe('logger', function () {
       const newLogger = {}
       const l = logger.setLogger(newLogger)
       expect(l).to.equal(newLogger)
-      expect(l.setLogger).to.exist
+      expect(l.setLogger).to.exist()
     })
   })
 })

@@ -85,4 +85,3 @@ function formatConfig (config) {
     process.exit(1)
   }
 }
-

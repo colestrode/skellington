@@ -6,6 +6,7 @@ const sinon = require('sinon')
 const proxyquire = require('proxyquire')
 
 chai.use(require('sinon-chai'))
+chai.use(require('dirty-chai'))
 
 describe('Debug Logger', function () {
   let logger
@@ -50,10 +51,10 @@ describe('Debug Logger', function () {
     logger.addLogger(controllerMock, testConfig)
     const loggingMiddleware = getLoggingMiddleware()
 
-    expect(hearsMock).to.have.been.called
+    expect(hearsMock).to.have.been.called()
     loggingMiddleware(patterns, messageMock)
     expect(controllerMock.hears_test).to.have.been.calledWith(patterns, messageMock)
-    expect(loggerMock.info).to.have.been.called
+    expect(loggerMock.info).to.have.been.called()
   })
 
   it('should not log if default hears_test returns false', function () {
@@ -62,7 +63,7 @@ describe('Debug Logger', function () {
     const loggingMiddleware = getLoggingMiddleware()
 
     loggingMiddleware(patterns, messageMock)
-    expect(loggerMock.info).not.to.have.been.called
+    expect(loggerMock.info).not.to.have.been.called()
   })
 
   it('should log if middleware returns true', function () {
@@ -73,9 +74,9 @@ describe('Debug Logger', function () {
     const loggingMiddleware = hearsMock.args[0][2]
 
     loggingMiddleware(patterns, messageMock)
-    expect(middleware).to.have.been.called
-    expect(controllerMock.hears_test).not.to.have.been.called
-    expect(loggerMock.info).to.have.been.called
+    expect(middleware).to.have.been.called()
+    expect(controllerMock.hears_test).not.to.have.been.called()
+    expect(loggerMock.info).to.have.been.called()
   })
 
   it('should not log if middleware returns false', function () {
@@ -86,8 +87,8 @@ describe('Debug Logger', function () {
     const loggingMiddleware = hearsMock.args[0][2]
 
     loggingMiddleware(patterns, messageMock)
-    expect(middleware).to.have.been.called
-    expect(loggerMock.info).not.to.have.been.called
+    expect(middleware).to.have.been.called()
+    expect(loggerMock.info).not.to.have.been.called()
   })
 
   it('should allow formatter to be overwritten', function () {
@@ -97,7 +98,7 @@ describe('Debug Logger', function () {
     const loggingMiddleware = getLoggingMiddleware()
     loggingMiddleware(patterns, messageMock)
 
-    expect(testConfig.formatter).to.have.been.called
+    expect(testConfig.formatter).to.have.been.called()
     const firstArg = testConfig.formatter.args[0][0]
     expect(firstArg).to.include.keys(['skellington'])
     expect(firstArg.skellington).to.include.keys(['file', 'config'])
