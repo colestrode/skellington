@@ -46,9 +46,9 @@ describe('server', function () {
   it('should not create endpoints if server is not created', function () {
     controllerMock.setupWebserver.yields(err)
     server.start(controllerMock, testConfig)
-    expect(controllerMock.setupWebserver).to.have.been.called
-    expect(controllerMock.createWebhookEndpoints).not.to.have.been.called
-    expect(controllerMock.createOauthEndpoints).not.to.have.been.called
+    expect(controllerMock.setupWebserver).to.have.been.called()
+    expect(controllerMock.createWebhookEndpoints).not.to.have.been.called()
+    expect(controllerMock.createOauthEndpoints).not.to.have.been.called()
   })
 
   describe('Oauth callback', function () {
@@ -73,7 +73,7 @@ describe('server', function () {
     it('should respond with 200 and success', function () {
       oauthCallback(null, reqMock, resMock)
       expect(resMock.status).to.have.been.calledWith(200)
-      expect(resMock.send).to.have.been.called
+      expect(resMock.send).to.have.been.called()
     })
 
     it('should redirect to successRedirect on success', function () {
@@ -85,7 +85,7 @@ describe('server', function () {
     it('should respond with a 500 and error if oauth fails', function () {
       oauthCallback(err, reqMock, resMock)
       expect(resMock.status).to.have.been.calledWith(500)
-      expect(resMock.send).to.have.been.called
+      expect(resMock.send).to.have.been.called()
     })
 
     it('should redirect to errorRedirect on error', function () {

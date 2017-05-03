@@ -6,6 +6,7 @@ const sinon = require('sinon')
 const _ = require('lodash')
 
 chai.use(require('sinon-chai'))
+chai.use(require('dirty-chai'))
 
 describe('help', function () {
   let controllerMock
@@ -41,7 +42,7 @@ describe('help', function () {
 
   it('should register a listener if no plugins have help text', function () {
     help.addHelpListeners(controllerMock, [plugin])
-    expect(controllerMock.hears).to.have.been.calledOnce
+    expect(controllerMock.hears).to.have.been.calledOnce()
 
     let callback = controllerMock.hears.args[0][2]
 

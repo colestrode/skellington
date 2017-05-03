@@ -6,6 +6,7 @@ const sinon = require('sinon')
 const proxyquire = require('proxyquire').noCallThru()
 
 chai.use(require('sinon-chai'))
+chai.use(require('dirty-chai'))
 
 describe('plugin-lifecycle', function () {
   let controllerMock
@@ -67,7 +68,7 @@ describe('plugin-lifecycle', function () {
     it('should continue if plugin init is missing', function () {
       delete plugin1.init
       lifecycle.initialize([plugin1, plugin2], controllerMock, botMock)
-      expect(plugin2.init).to.have.been.called
+      expect(plugin2.init).to.have.been.called()
     })
   })
 
@@ -103,7 +104,7 @@ describe('plugin-lifecycle', function () {
     it('should continue if plugin botConnected is missing', function () {
       delete plugin1.botConnected
       lifecycle.botConnected([plugin1, plugin2], controllerMock, botMock)
-      expect(plugin2.botConnected).to.have.been.called
+      expect(plugin2.botConnected).to.have.been.called()
     })
   })
 })

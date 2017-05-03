@@ -7,6 +7,7 @@ const proxyquire = require('proxyquire').noCallThru()
 const _ = require('lodash')
 
 chai.use(require('sinon-chai'))
+chai.use(require('dirty-chai'))
 
 describe('Skellington', function () {
   let skellington
@@ -202,13 +203,13 @@ describe('Skellington', function () {
     it('should not set up a webserver if port is not pased', function () {
       delete testConfig.port
       skellington(testConfig)
-      expect(serverMock.start).not.to.have.been.called
+      expect(serverMock.start).not.to.have.been.called()
     })
 
     it('should set up a single team bot if slack token is passed', function () {
       const instance = skellington(testConfig)
       expect(singleBotMock.start).to.have.been.calledWith(controllerMock, instance.__config)
-      expect(slackAppMock.start).not.to.have.been.called
+      expect(slackAppMock.start).not.to.have.been.called()
     })
 
     it('should set up a slack app if slackToken is missing', function () {
@@ -218,7 +219,7 @@ describe('Skellington', function () {
 
       const instance = skellington(testConfig)
       expect(slackAppMock.start).to.have.been.calledWith(controllerMock, instance.__config)
-      expect(singleBotMock.start).not.to.have.been.called
+      expect(singleBotMock.start).not.to.have.been.called()
     })
   })
 
@@ -234,13 +235,13 @@ describe('Skellington', function () {
 
     it('should not expose config if debug is false', function () {
       const instance = skellington(testConfig)
-      expect(instance.__config).not.to.exist
+      expect(instance.__config).not.to.exist()
     })
 
     it('should expose config if debug is true', function () {
       testConfig.debug = true
       const instance = skellington(testConfig)
-      expect(instance.__config).to.exist
+      expect(instance.__config).to.exist()
     })
 
     it('should not set up debug logger if debug is false', function () {
@@ -248,7 +249,7 @@ describe('Skellington', function () {
       const botkitDebug = botkitMock.slackbot.args[0][0].debug
 
       expect(debugLoggerMock.addLogger).not.to.have.been.calledWith(controllerMock, {})
-      expect(botkitDebug).to.be.false
+      expect(botkitDebug).to.be.false()
     })
 
     it('should pass debug options', function () {
@@ -257,7 +258,7 @@ describe('Skellington', function () {
       const botkitDebug = botkitMock.slackbot.args[0][0].debug
 
       expect(debugLoggerMock.addLogger).not.to.have.been.calledWith(controllerMock, testConfig.debugOptions)
-      expect(botkitDebug).to.be.false
+      expect(botkitDebug).to.be.false()
     })
 
     it('should set up debug logger and botkit logging if debug is true', function () {
@@ -266,8 +267,8 @@ describe('Skellington', function () {
       skellington(testConfig)
       const botkitDebug = botkitMock.slackbot.args[0][0].debug
 
-      expect(debugLoggerMock.addLogger).to.have.been.called
-      expect(botkitDebug).to.be.true
+      expect(debugLoggerMock.addLogger).to.have.been.called()
+      expect(botkitDebug).to.be.true()
     })
 
     it('should set up botkit debug false if botkit config.debug is false and debug is true', function () {
@@ -277,8 +278,8 @@ describe('Skellington', function () {
       skellington(testConfig)
       const botkitDebug = botkitMock.slackbot.args[0][0].debug
 
-      expect(debugLoggerMock.addLogger).to.have.been.called
-      expect(botkitDebug).to.be.false
+      expect(debugLoggerMock.addLogger).to.have.been.called()
+      expect(botkitDebug).to.be.false()
     })
   })
 })

@@ -7,6 +7,7 @@ const proxyquire = require('proxyquire').noCallThru()
 const _ = require('lodash')
 
 chai.use(require('sinon-chai'))
+chai.use(require('dirty-chai'))
 
 describe('slack-app', function () {
   let testConfig
@@ -113,10 +114,10 @@ describe('slack-app', function () {
   it('should read teams from storage and reconnnect them', function () {
     slackApp.start(controllerMock, testConfig)
 
-    expect(storageMock.teams.all).to.have.been.called
-    expect(controllerMock.spawn).to.have.been.calledTwice
-    expect(botMock.startRTM).to.have.been.called
-    expect(lifecycleMock.botConnected).to.have.been.called
+    expect(storageMock.teams.all).to.have.been.called()
+    expect(controllerMock.spawn).to.have.been.calledTwice()
+    expect(botMock.startRTM).to.have.been.called()
+    expect(lifecycleMock.botConnected).to.have.been.called()
   })
 
   it('should not start rtm if team does not have a bot', function () {
@@ -124,20 +125,20 @@ describe('slack-app', function () {
     storageMock.teams.all.yields(null, teams)
     slackApp.start(controllerMock, testConfig)
 
-    expect(storageMock.teams.all).to.have.been.called
-    expect(controllerMock.spawn).not.to.have.been.calledTwice
-    expect(botMock.startRTM).not.to.have.been.called
-    expect(lifecycleMock.botConnected).not.to.have.been.called
+    expect(storageMock.teams.all).to.have.been.called()
+    expect(controllerMock.spawn).not.to.have.been.calledTwice()
+    expect(botMock.startRTM).not.to.have.been.called()
+    expect(lifecycleMock.botConnected).not.to.have.been.called()
   })
 
   it('should exit if it cannot read teams from storage', function () {
     storageMock.teams.all.yields(err)
     slackApp.start(controllerMock, testConfig)
 
-    expect(storageMock.teams.all).to.have.been.called
-    expect(controllerMock.spawn).not.to.have.been.calledTwice
-    expect(botMock.startRTM).not.to.have.been.called
-    expect(lifecycleMock.botConnected).not.to.have.been.called
+    expect(storageMock.teams.all).to.have.been.called()
+    expect(controllerMock.spawn).not.to.have.been.calledTwice()
+    expect(botMock.startRTM).not.to.have.been.called()
+    expect(lifecycleMock.botConnected).not.to.have.been.called()
     expect(process.exit).to.have.been.calledWith(1)
   })
 
@@ -145,33 +146,33 @@ describe('slack-app', function () {
     botMock.startRTM.yields('account_inactive')
     slackApp.start(controllerMock, testConfig)
 
-    expect(storageMock.teams.all).to.have.been.called
-    expect(controllerMock.spawn).to.have.been.calledTwice
-    expect(botMock.startRTM).to.have.been.called
-    expect(storageMock.teams.save).to.have.been.called
-    expect(lifecycleMock.botConnected).not.to.have.been.called
+    expect(storageMock.teams.all).to.have.been.called()
+    expect(controllerMock.spawn).to.have.been.calledTwice()
+    expect(botMock.startRTM).to.have.been.called()
+    expect(storageMock.teams.save).to.have.been.called()
+    expect(lifecycleMock.botConnected).not.to.have.been.called()
   })
 
   it('should remove team for invalid_auth error', function () {
     botMock.startRTM.yields('invalid_auth')
     slackApp.start(controllerMock, testConfig)
 
-    expect(storageMock.teams.all).to.have.been.called
-    expect(controllerMock.spawn).to.have.been.calledTwice
-    expect(botMock.startRTM).to.have.been.called
-    expect(storageMock.teams.save).to.have.been.called
-    expect(lifecycleMock.botConnected).not.to.have.been.called
+    expect(storageMock.teams.all).to.have.been.called()
+    expect(controllerMock.spawn).to.have.been.calledTwice()
+    expect(botMock.startRTM).to.have.been.called()
+    expect(storageMock.teams.save).to.have.been.called()
+    expect(lifecycleMock.botConnected).not.to.have.been.called()
   })
 
   it('should not remove team for other errors', function () {
     botMock.startRTM.yields('two dots')
     slackApp.start(controllerMock, testConfig)
 
-    expect(storageMock.teams.all).to.have.been.called
-    expect(controllerMock.spawn).to.have.been.calledTwice
-    expect(botMock.startRTM).to.have.been.called
-    expect(storageMock.teams.save).not.to.have.been.called
-    expect(lifecycleMock.botConnected).not.to.have.been.called
+    expect(storageMock.teams.all).to.have.been.called()
+    expect(controllerMock.spawn).to.have.been.calledTwice()
+    expect(botMock.startRTM).to.have.been.called()
+    expect(storageMock.teams.save).not.to.have.been.called()
+    expect(lifecycleMock.botConnected).not.to.have.been.called()
   })
 
   describe('event: create_bot', function () {
@@ -209,22 +210,22 @@ describe('slack-app', function () {
 
     it('should start rtm and call botConnected', function () {
       callback(newBot)
-      expect(newBot.startRTM).to.have.been.called
-      expect(lifecycleMock.botConnected).to.have.been.called
+      expect(newBot.startRTM).to.have.been.called()
+      expect(lifecycleMock.botConnected).to.have.been.called()
     })
 
     it('should only connect a bot once', function () {
       callback(newBot)
       callback(newBot)
-      expect(newBot.startRTM).to.have.been.calledOnce
-      expect(lifecycleMock.botConnected).to.have.been.calledOnce
+      expect(newBot.startRTM).to.have.been.calledOnce()
+      expect(lifecycleMock.botConnected).to.have.been.calledOnce()
     })
 
     it('should not call botConnected when rtm cannot connect', function () {
       newBot.startRTM.yields(err)
       callback(newBot)
-      expect(newBot.startRTM).to.have.been.called
-      expect(lifecycleMock.botConnected).not.to.have.been.called
+      expect(newBot.startRTM).to.have.been.called()
+      expect(lifecycleMock.botConnected).not.to.have.been.called()
     })
   })
 
