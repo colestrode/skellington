@@ -10,26 +10,12 @@ chai.use(require('sinon-chai'))
 
 describe('Skellington', function () {
   let skellington
-  let botkitMock
-  let controllerMock
-  let debugLoggerMock
-  let serverMock
-  let helpMock
-  let utilsMock
-  let singleBotMock
-  let slackAppMock
   let loggerInstanceMock
   let skellingtonLoggerMock
   let loggerLibMock
+  let engineMock
 
   beforeEach(function () {
-    controllerMock = {}
-
-    botkitMock = {
-      slackbot: sinon.stub().returns(controllerMock)
-    }
-
-    sinon.stub(process, 'exit')
 
     loggerInstanceMock = {
       setLogger: sinon.stub(),
@@ -44,46 +30,38 @@ describe('Skellington', function () {
 
     skellingtonLoggerMock = sinon.stub().returnsArg(0)
 
-    debugLoggerMock = {
-      addLogger: sinon.stub()
-    }
-
-    serverMock = {
-      start: sinon.stub()
-    }
-
-    helpMock = {
-      addHelpListeners: sinon.stub()
-    }
-
-    utilsMock = {
-      logError: sinon.stub()
-    }
-
-    singleBotMock = {
-      start: sinon.stub()
-    }
-
-    slackAppMock = {
-      start: sinon.stub()
-    }
-
     skellington = proxyquire('../../index', {
-      'botkit': botkitMock,
-      'skellington-logger': skellingtonLoggerMock,
-      './lib/debug-logger': debugLoggerMock,
-      './lib/server': serverMock,
-      './lib/help': helpMock,
-      './lib/logger': loggerLibMock,
-      './lib/utils': utilsMock,
-      './lib/slack-app': slackAppMock,
-      './lib/single-team-bot': singleBotMock
+      'skellington-logger': skellingtonLoggerMock
     })
   })
 
-  afterEach(function () {
-    process.exit.restore()
-  })
+  describe('config', function() {
+
+    beforeEach(function() {
+
+    });
+
+    it('should set defaults', function() {
+
+    });
+
+    it('should accept a logger', function() {
+
+    });
+  });
+
+  describe('engine interface', function() {
+
+    beforeEach(function() {
+
+    });
+
+    it('should ', function() {
+
+    });
+  });
+
+
 
   describe('config', function () {
     let testConfig

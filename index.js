@@ -1,18 +1,27 @@
 'use strict'
 
 const _ = require('lodash')
+const express = require('express')
 let logger = require('skellington-logger')('skellington')
 
 module.exports = (cfg) => {
-  const instance = {}
   const config = _.defaults(_.cloneDeep(cfg), {debug: false, plugins: [], engines: []})
+  const instance = { __config: config }
 
   if (config.logger) {
     logger = config.logger
   }
 
+  startServer(config)
   startYourEngines(config)
   return instance
+}
+
+function startServer(config) {
+  if (config.port) {
+    config.server = express();
+    config.server.listen(config.port, () => logger.info(`server listening on port ${config.port}`))
+  }
 }
 
 function startYourEngines(config) {
@@ -21,6 +30,7 @@ function startYourEngines(config) {
   _.forEach(config.engines, (engine) => {
     try {
       const engineConf = _.defaults({}, config[engine.type], { logger })
+      engineConf.server = config.server // pass server if it exists
       engine.bootstrap(engineConf)
 
       // only add help and plugins if engine was successfully bootstrapped
