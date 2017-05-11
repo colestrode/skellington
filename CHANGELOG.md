@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.0](https://github.com/Skellington-Closet/skellington/compare/v1.2.0...v1.3.0)
+
+### Added
+
+- Adds `startRtm` option for Slack apps. If `startRtm` is strictly false Skellington will not initiate an RTM connection when adding a new bot.
+This means that the `botConnected` lifecycle method will never be called.
+
 ## [1.2.0](https://github.com/Skellington-Closet/skellington/compare/v1.1.2...v1.2.0)
 
 ### Changed

@@ -99,6 +99,10 @@ to verify the callback from the Identity Provider (Slack, in this case) is legit
 
 - `scopes` (Array) The [OAuth scopes](https://api.slack.com/docs/oauth-scopes) your app will be requesting. Defaults to no scopes. Scopes can be passed from plugins as well.
 
+- `startRtm` (Boolean) Defaults to `true`. If strictly false Skellington will not initiate an RTM connection when adding a new bot.
+Setting `startRtm` false is good for Slack apps that will rely solely on the Events API for events. NOTE: When `startRtm` is 
+false the `botConnected` lifecycle method will never be called.
+
 - `successRedirectUri` (String) A URI to for Skellington to redirect to after a successful OAuth
 authentication flow.
 
@@ -162,7 +166,7 @@ and the bot. `botConnected` can be used for building a cache of team specific en
 information about a team you could need.
 
 `botConnected` is called for single team bots and Slack apps, though for single team bots it is called at the same moment
-in the lifecycle as `init`.
+in the lifecycle as `init`. If `startRtm` is false for a Slack app, then this lifecycle method will never be called.
 
 It is only fired if the RTM session can be established unlike the Botkit `create_bot` event, which is called after a successful OAuth
 authorization flow, but before an RTM session is established.
