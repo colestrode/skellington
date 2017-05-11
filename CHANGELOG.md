@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Adds `startRtm` option for Slack apps. If `startRtm` is strictly false Skellington will not initiate an RTM connection when adding a new bot.
-This means that the `botConnected` lifecycle method will never be called.
+Setting `startRtm` to false also means that the `botConnected` lifecycle method will never be called.
 
 ## [1.2.0](https://github.com/Skellington-Closet/skellington/compare/v1.1.2...v1.2.0)
 

@@ -166,7 +166,7 @@ and the bot. `botConnected` can be used for building a cache of team specific en
 information about a team you could need.
 
 `botConnected` is called for single team bots and Slack apps, though for single team bots it is called at the same moment
-in the lifecycle as `init`. If `startRtm` is false for a Slack app, then this lifecycle method will never be called.
+in the lifecycle as `init`. If `startRtm` is false for a Slack app then this lifecycle method will never be called.
 
 It is only fired if the RTM session can be established unlike the Botkit `create_bot` event, which is called after a successful OAuth
 authorization flow, but before an RTM session is established.
