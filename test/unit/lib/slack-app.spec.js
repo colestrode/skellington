@@ -175,6 +175,14 @@ describe('slack-app', function () {
     expect(lifecycleMock.botConnected).not.to.have.been.called()
   })
 
+  it('should not read teams for storage or add event listeners when isRtm is strictly false', function () {
+    testConfig.startRtm = false
+    slackApp.start(controllerMock, testConfig)
+
+    expect(controllerMock.spawn).not.to.have.been.called()
+    expect(controllerMock.on).not.to.have.been.called()
+  })
+
   describe('event: create_bot', function () {
     let callback
     let testConfig
