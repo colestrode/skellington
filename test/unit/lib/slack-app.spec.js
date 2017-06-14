@@ -21,7 +21,7 @@ describe('slack-app', function () {
   let err
   let slackApp
 
-  function getOnCallback (eventName) {
+  function getOnCallback(eventName) {
     return _.find(controllerMock.on.args, (args) => {
       return args[0] === eventName
     })[1]
@@ -130,6 +130,7 @@ describe('slack-app', function () {
     expect(storageMock.teams.all).to.have.been.called()
     expect(controllerMock.spawn).not.to.have.been.calledTwice()
     expect(botMock.startRTM).not.to.have.been.called()
+    expect(controllerMock.startTicking).not.to.have.been.called()
     expect(lifecycleMock.botConnected).not.to.have.been.called()
   })
 
@@ -140,6 +141,7 @@ describe('slack-app', function () {
     expect(storageMock.teams.all).to.have.been.called()
     expect(controllerMock.spawn).not.to.have.been.calledTwice()
     expect(botMock.startRTM).not.to.have.been.called()
+    expect(controllerMock.startTicking).not.to.have.been.called()
     expect(lifecycleMock.botConnected).not.to.have.been.called()
     expect(process.exit).to.have.been.calledWith(1)
   })
@@ -151,6 +153,7 @@ describe('slack-app', function () {
     expect(storageMock.teams.all).to.have.been.called()
     expect(controllerMock.spawn).to.have.been.calledTwice()
     expect(botMock.startRTM).to.have.been.called()
+    expect(controllerMock.startTicking).not.to.have.been.called()
     expect(storageMock.teams.save).to.have.been.called()
     expect(lifecycleMock.botConnected).not.to.have.been.called()
   })
@@ -162,6 +165,7 @@ describe('slack-app', function () {
     expect(storageMock.teams.all).to.have.been.called()
     expect(controllerMock.spawn).to.have.been.calledTwice()
     expect(botMock.startRTM).to.have.been.called()
+    expect(controllerMock.startTicking).not.to.have.been.called()
     expect(storageMock.teams.save).to.have.been.called()
     expect(lifecycleMock.botConnected).not.to.have.been.called()
   })
@@ -173,6 +177,7 @@ describe('slack-app', function () {
     expect(storageMock.teams.all).to.have.been.called()
     expect(controllerMock.spawn).to.have.been.calledTwice()
     expect(botMock.startRTM).to.have.been.called()
+    expect(controllerMock.startTicking).not.to.have.been.called()
     expect(storageMock.teams.save).not.to.have.been.called()
     expect(lifecycleMock.botConnected).not.to.have.been.called()
   })
@@ -183,6 +188,7 @@ describe('slack-app', function () {
 
     expect(controllerMock.spawn).not.to.have.been.called()
     expect(controllerMock.on).not.to.have.been.called()
+    expect(controllerMock.startTicking).to.have.been.called()
   })
 
   describe('event: create_bot', function () {
