@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.1](https://github.com/Skellington-Closet/skellington/compare/v1.3.0...v1.3.1)
+
+### Fixed
+
+- Calls `controller.startTicking()` if `startRtm` is false. This fixes and issue where conversations would not work for Slack Apps. See #54 for more details.
+
 ## [1.3.0](https://github.com/Skellington-Closet/skellington/compare/v1.2.0...v1.3.0)
 
 ### Added
