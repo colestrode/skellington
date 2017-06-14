@@ -53,7 +53,7 @@ describe('slack-app', function () {
       identity: sinon.stub()
     }
 
-    teams = [{bot: 'team1', id: 'heisenberg'}, {bot: 'team2', id: 'capncook'}]
+    teams = [{ bot: 'team1', id: 'heisenberg' }, { bot: 'team2', id: 'capncook' }]
 
     storageMock = {
       teams: {
@@ -79,6 +79,7 @@ describe('slack-app', function () {
       log: sinon.stub(),
       on: sinon.stub(),
       configureSlackApp: sinon.stub(),
+      startTicking: sinon.stub(),
       storage: storageMock
     }
 
@@ -117,6 +118,7 @@ describe('slack-app', function () {
     expect(storageMock.teams.all).to.have.been.called()
     expect(controllerMock.spawn).to.have.been.calledTwice()
     expect(botMock.startRTM).to.have.been.called()
+    expect(controllerMock.startTicking).not.to.have.been.called()
     expect(lifecycleMock.botConnected).to.have.been.called()
   })
 
