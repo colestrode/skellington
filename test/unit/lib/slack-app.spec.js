@@ -21,7 +21,7 @@ describe('slack-app', function () {
   let err
   let slackApp
 
-  function getOnCallback(eventName) {
+  function getOnCallback (eventName) {
     return _.find(controllerMock.on.args, (args) => {
       return args[0] === eventName
     })[1]
