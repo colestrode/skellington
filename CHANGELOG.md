@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.4.0](https://github.com/Skellington-Closet/skellington/compare/v1.3.1...v1.4.0)
+
+### Changed
+
+- Bumps Botkit dep to `0.6.3`. Bumps dev deps. Changes build target to match current Node LTS versions.
+
 ## [1.3.1](https://github.com/Skellington-Closet/skellington/compare/v1.3.0...v1.3.1)
 
 ### Fixed
