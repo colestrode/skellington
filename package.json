@@ -38,7 +38,7 @@
     "proxyquire": "^1.7.4",
     "sinon": "^4.0.1",
     "sinon-chai": "^2.14.0",
-    "standard": "^10.0.2"
+    "standard": "^11.0.0"
   },
   "standard": {
     "globals": [
