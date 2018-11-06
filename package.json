@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/colestrode/skellington#readme",
   "dependencies": {
-    "botkit": "^0.6.0",
+    "botkit": "^0.6.20",
     "lodash": "^4.6.1",
     "skellington-logger": "^1.0.0"
   },
